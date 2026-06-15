@@ -1,11 +1,12 @@
-import { useConfig } from "@/hooks/useConfig"
+import { useConfigStore } from "@/store/config"
 import { SettingsContent, SettingsTitle, SettingsCard, SettingsItem } from "@/components/settings"
 import { Select } from "@/components/select"
 import { Switch } from "@/components/switch"
 import { SunIcon, BrowserIcon, FrameCornersIcon } from "@phosphor-icons/react"
 
 export function GeneralSetting() {
-  const { config, saveConfig } = useConfig()
+  const config = useConfigStore((s) => s.config)
+  const saveConfig = useConfigStore((s) => s.saveConfig)
 
   // 等待配置加载完成后再出页面，否则 Switch 的动画会闪一下
   if (!config) return null

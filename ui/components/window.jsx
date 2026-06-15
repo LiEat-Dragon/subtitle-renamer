@@ -1,9 +1,9 @@
 import { type } from "@tauri-apps/plugin-os"
-import { useConfig } from "@/hooks/useConfig"
+import { useConfigStore } from "@/store/config"
 import { cn } from "@/utils/cn"
 
 export function AppWindow({ children }) {
-  const { config } = useConfig()
+  const config = useConfigStore((s) => s.config)
   const enableVibrancy = config?.general?.window_vibrancy ?? true
 
   const itemPlatform = {

@@ -1,6 +1,6 @@
 import { basename } from "@tauri-apps/api/path"
 import { useState, useCallback, useEffect } from "react"
-import { useConfig } from "@/hooks/useConfig"
+import { useConfigStore } from "@/store/config"
 import { useSubtitleStore } from "@/store/subtitle"
 import { Link } from "react-router-dom"
 import { detectFiles } from "@/utils/detect"
@@ -23,7 +23,8 @@ export function SubtitleRename() {
   const [fileData, setFileData] = useState([]) // 展平为带路径的数组，用于重命名
   const [tableData, setTableData] = useState([]) // 上面数组的基础上移除了路径，只保留文件名
 
-  const { config, saveConfig } = useConfig()
+  const config = useConfigStore((s) => s.config)
+  const saveConfig = useConfigStore((s) => s.saveConfig)
   const { fileList, archiveList, setFileList, setArchiveList, clearAll } = useSubtitleStore()
 
   const tableColumns = [

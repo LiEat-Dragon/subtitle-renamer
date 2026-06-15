@@ -2,7 +2,7 @@ import { basename, dirname } from "@tauri-apps/api/path"
 import { openPath } from "@tauri-apps/plugin-opener"
 import { writeText } from "@tauri-apps/plugin-clipboard-manager"
 import { useCallback } from "react"
-import { useConfig } from "@/hooks/useConfig"
+import { useConfigStore } from "@/store/config"
 import { useSubtitleStore } from "@/store/subtitle"
 import { sortFiles } from "@/utils/sort"
 import { toast } from "@/components/toast"
@@ -12,7 +12,7 @@ import { ArrowsClockwiseIcon, ArrowFatUpIcon, FileMinusIcon, StackMinusIcon, Fol
 const colKeys = ["video", "sc", "tc"]
 
 export function SubtitleTableContextMenu({ cell, fileData, onClose }) {
-  const { config } = useConfig()
+  const config = useConfigStore((s) => s.config)
   const { fileList, setFileList } = useSubtitleStore()
 
   const handleOpenLocation = useCallback(async () => {

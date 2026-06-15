@@ -15,10 +15,12 @@ import { RenameSetting } from "@/pages/settings-rename"
 import { DeveloperSetting } from "@/pages/settings-developer"
 import { AboutSetting } from "@/pages/settings-about"
 import { SubtitlesIcon, GearSixIcon } from "@phosphor-icons/react"
+import { useConfigStore } from "@/store/config"
 
 // 初始化配置和主题模式
 initConfig().then(async () => {
   const config = await getConfig()
+  useConfigStore.getState().hydrate(config)
   await invoke("set_theme", { theme: config.general.theme })
 })
 

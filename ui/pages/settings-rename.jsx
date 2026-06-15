@@ -1,4 +1,4 @@
-import { useConfig } from "@/hooks/useConfig"
+import { useConfigStore } from "@/store/config"
 import { SettingsContent, SettingsTitle, SettingsCard, SettingsItem } from "@/components/settings"
 import { Select } from "@/components/select"
 import { Combobox } from "@/components/combobox"
@@ -19,7 +19,8 @@ export const removeSubOptions = [
 ]
 
 export function RenameSetting() {
-  const { config, saveConfig } = useConfig()
+  const config = useConfigStore((s) => s.config)
+  const saveConfig = useConfigStore((s) => s.saveConfig)
 
   if (!config) return null
 
