@@ -13,7 +13,8 @@ const colKeys = ["video", "sc", "tc"]
 
 export function SubtitleTableContextMenu({ cell, fileData, onClose }) {
   const config = useConfigStore((s) => s.config)
-  const { fileList, setFileList } = useSubtitleStore()
+  const fileList = useSubtitleStore((s) => s.fileList)
+  const setFileList = useSubtitleStore((s) => s.setFileList)
 
   const handleOpenLocation = useCallback(async () => {
     try {

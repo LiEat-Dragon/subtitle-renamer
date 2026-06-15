@@ -25,13 +25,17 @@ export function SubtitleRename() {
 
   const config = useConfigStore((s) => s.config)
   const saveConfig = useConfigStore((s) => s.saveConfig)
-  const { fileList, archiveList, setFileList, setArchiveList, clearAll } = useSubtitleStore()
 
   const tableColumns = [
     { key: "video", title: "视频文件" },
     { key: "sc", title: config?.subtitle?.detect_language ? "简体字幕" : "字幕文件" },
     ...(config?.subtitle?.detect_language ? [{ key: "tc", title: "繁体字幕" }] : [])
   ]
+  const fileList = useSubtitleStore((s) => s.fileList)
+  const archiveList = useSubtitleStore((s) => s.archiveList)
+  const setFileList = useSubtitleStore((s) => s.setFileList)
+  const setArchiveList = useSubtitleStore((s) => s.setArchiveList)
+  const clearAll = useSubtitleStore((s) => s.clearAll)
 
   useEffect(() => {
     const processData = async () => {
