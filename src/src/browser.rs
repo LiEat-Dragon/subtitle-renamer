@@ -33,7 +33,7 @@ const PAGE_INSPECTION_SCRIPT: &str = r##"
 
 pub fn open_challenge_inner(app: AppHandle) -> Result<(), String> {
     let url = Url::parse(HOME_URL).map_err(|e| e.to_string())?;
-    let window = ensure_window(&app, url, true)?;
+    let window = navigate_browser_window(&app, url)?;
     let _ = window.unminimize();
     window.show().map_err(|e| e.to_string())?;
     window.set_focus().map_err(|e| e.to_string())
@@ -46,12 +46,16 @@ pub fn search_posts_inner(app: AppHandle, query: &str) -> Result<(), String> {
         .append_pair("searchsubmit", "yes")
         .append_pair("srchtxt", query.trim());
 
-    ensure_window(&app, url, false).map(|_| ())
+    navigate_browser_window(&app, url).map(|window| {
+        let _ = window.hide();
+    })
 }
 
 pub fn get_post_inner(app: AppHandle, post_url: &str) -> Result<(), String> {
     let url = Url::parse(post_url).map_err(|e| e.to_string())?;
-    ensure_window(&app, url, false).map(|_| ())
+    navigate_browser_window(&app, url).map(|window| {
+        let _ = window.hide();
+    })
 }
 
 pub fn download_subtitle_inner(app: AppHandle, file_url: &str) -> Result<(), String> {
@@ -59,46 +63,30 @@ pub fn download_subtitle_inner(app: AppHandle, file_url: &str) -> Result<(), Str
     if !url.as_str().contains("mod=attachment") {
         return Err("无效的附件地址".to_string());
     }
-    ensure_window(&app, url, false).map(|_| ())
+    navigate_browser_window(&app, url).map(|window| {
+        let _ = window.hide();
+    })
 }
 
-// 创建或复用 webview
-fn ensure_window(
-    app: &AppHandle,
-    initial_url: Url,
-    visible: bool,
-) -> Result<WebviewWindow, String> {
+// 创建隐藏的浏览器窗口
+pub fn create_hidden_window(app: &AppHandle) -> Result<(), String> {
     if let Some(window) = app.get_webview_window(WINDOW_LABEL) {
-        if visible {
-            window.show().map_err(|e| e.to_string())?;
-        } else {
-            let _ = window.hide();
-        }
-        window.navigate(initial_url).map_err(|e| e.to_string())?;
-        return Ok(window);
+        let _ = window.hide();
+        return Ok(());
     }
 
-    let data_directory = app
-        .path()
-        .app_data_dir()
-        .map_err(|e| e.to_string())?
-        .join("browser");
-    std::fs::create_dir_all(&data_directory).map_err(|e| e.to_string())?;
-
+    let url = Url::parse(HOME_URL).map_err(|e| e.to_string())?;
     let pending_downloads = Arc::new(Mutex::new(HashMap::<String, PathBuf>::new()));
     let downloads_for_handler = Arc::clone(&pending_downloads);
     let app_for_downloads = app.clone();
     let app_for_pages = app.clone();
 
-    WebviewWindowBuilder::new(app, WINDOW_LABEL, WebviewUrl::External(initial_url))
+    WebviewWindowBuilder::new(app, WINDOW_LABEL, WebviewUrl::External(url))
         .title("CF过盾小助手")
         .min_inner_size(800.0, 600.0)
         .center()
-        .focused(visible)
-        .visible(visible)
-        .data_directory(data_directory)
+        .visible(false)
         .enable_clipboard_access()
-        .on_navigation(|_| true)
         .on_page_load(move |window, payload| {
             if payload.event() != PageLoadEvent::Finished {
                 return;
@@ -151,8 +139,7 @@ fn ensure_window(
                     }
 
                     if let Some(path) = path.or(remembered_path) {
-                        let _ = app_for_downloads
-                            .emit("download-finished", path.to_string_lossy());
+                        let _ = app_for_downloads.emit("download-finished", path.to_string_lossy());
                     }
                 }
                 _ => {}
@@ -160,7 +147,18 @@ fn ensure_window(
             true
         })
         .build()
+        .map(|_| ())
         .map_err(|e| e.to_string())
+}
+
+// 在浏览器窗口中打开页面
+fn navigate_browser_window(app: &AppHandle, url: Url) -> Result<WebviewWindow, String> {
+    let window = app
+        .get_webview_window(WINDOW_LABEL)
+        .ok_or_else(|| "浏览器窗口初始化失败，请重启应用".to_string())?;
+
+    window.navigate(url).map_err(|e| e.to_string())?;
+    Ok(window)
 }
 
 // 生成下载路径，并在重名时追加序号

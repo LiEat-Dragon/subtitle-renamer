@@ -60,6 +60,7 @@ pub fn run() {
         .plugin(
             tauri_plugin_window_state::Builder::default()
                 .skip_initial_state("main")
+                .skip_initial_state("acgrip-browser")
                 .build(),
         )
         .plugin(tauri_plugin_opener::init())
@@ -81,6 +82,9 @@ pub fn run() {
         ])
         .setup(|app| {
             let window = app.get_webview_window("main").unwrap();
+
+            // 预创建浏览器窗口
+            browser::create_hidden_window(app.handle()).map_err(std::io::Error::other)?;
 
             // 获取配置
             let store = app.store("config.json").ok();
