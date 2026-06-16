@@ -7,7 +7,6 @@ import { TagIcon, HighlighterIcon, ArrowsClockwiseIcon, FoldersIcon, FolderMinus
 import { Input } from "@/components/input"
 
 export const moveSubOptions = [
-  { value: "none", label: "保持原位" },
   { value: "copy", label: "复制字幕" },
   { value: "cut", label: "剪切字幕" }
 ]

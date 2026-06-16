@@ -47,9 +47,7 @@ export async function renameSubtitles(fileData, archiveList) {
         if (lang === removeSub) continue
         const subExtRaw = await extname(subPath)
         const subExt = config.subtitle.lowercase_extension ? subExtRaw.toLowerCase() : subExtRaw
-        const subDir = await dirname(subPath)
-        const targetDir = moveSub === "none" ? subDir : videoDir
-        const newPath = await join(targetDir, `${videoName}${config.subtitle.union_extension}${suffix}.${subExt}`)
+        const newPath = await join(videoDir, `${videoName}${config.subtitle.union_extension}${suffix}.${subExt}`)
 
         if (await exists(newPath)) {
           toast.error({ title: "目标文件已存在", description: newPath })
