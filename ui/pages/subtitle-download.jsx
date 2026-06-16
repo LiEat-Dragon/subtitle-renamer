@@ -47,6 +47,7 @@ export function SubtitleDownload() {
   const archiveList = useTableStore((s) => s.download.archiveList)
   const setFileList = useTableStore((s) => s.setFileList)
   const setArchiveList = useTableStore((s) => s.setArchiveList)
+  const moveFileItem = useTableStore((s) => s.moveFileItem)
   const clearAll = useTableStore((s) => s.clearAll)
   const searchResults = useDownloadStore((s) => s.searchResults)
   const isSearching = useDownloadStore((s) => s.isSearching)
@@ -184,6 +185,11 @@ export function SubtitleDownload() {
     })()
   }
 
+  // 表格重新排序
+  const handleTableReorder = useCallback(({ columnKey, fromIndex, targetIndex }) => {
+    moveFileItem(tableScope, columnKey, fromIndex, targetIndex)
+  }, [moveFileItem, tableScope])
+
   // 切换配置标签状态
   const handleCycleSubtitleConfig = useCallback((key, options) => {
     const currentValue = config?.subtitle?.[key]
@@ -214,7 +220,9 @@ export function SubtitleDownload() {
                     ...(config?.subtitle?.detect_language ? [{ key: "tc", title: "繁体字幕" }] : [])
                   ]}
                   data={tableData}
+                  cellIds={fileData}
                   onContextMenu={setCell}
+                  onReorder={handleTableReorder}
                 />
               )
             : (

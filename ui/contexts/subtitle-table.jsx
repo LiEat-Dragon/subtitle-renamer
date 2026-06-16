@@ -14,6 +14,7 @@ export function SubtitleTableContextMenu({ cell, fileData, tableScope, onClose }
   const config = useConfigStore((s) => s.config)
   const fileList = useTableStore((s) => s[tableScope].fileList)
   const setFileList = useTableStore((s) => s.setFileList)
+  const moveFileItem = useTableStore((s) => s.moveFileItem)
 
   const handleOpenLocation = useCallback(async () => {
     try {
@@ -56,14 +57,8 @@ export function SubtitleTableContextMenu({ cell, fileData, tableScope, onClose }
 
   const handleMove = useCallback((offset) => {
     const key = colKeys[cell.col]
-    const targetRow = cell.row + offset
-    setFileList(tableScope, (prev) => ({
-      ...prev,
-      [key]: prev[key].map((v, i) =>
-        i === cell.row ? prev[key][targetRow] : i === targetRow ? prev[key][cell.row] : v
-      )
-    }))
-  }, [cell, setFileList, tableScope])
+    moveFileItem(tableScope, key, cell.row, cell.row + offset)
+  }, [cell, moveFileItem, tableScope])
 
   const handleDeleteItem = useCallback(() => {
     const key = colKeys[cell.col]

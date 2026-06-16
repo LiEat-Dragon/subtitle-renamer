@@ -27,6 +27,7 @@ export function SubtitleRename() {
   const archiveList = useTableStore((s) => s.rename.archiveList)
   const setFileList = useTableStore((s) => s.setFileList)
   const setArchiveList = useTableStore((s) => s.setArchiveList)
+  const moveFileItem = useTableStore((s) => s.moveFileItem)
   const clearAll = useTableStore((s) => s.clearAll)
 
   // 将文件列表转换为表格数据，并根据配置决定是否高亮差异
@@ -49,6 +50,11 @@ export function SubtitleRename() {
       error: { type: "warning", title: (error) => error.message || String(error) }
     })
   }, [fileList, archiveList, setFileList, setArchiveList, tableScope])
+
+  // 表格重新排序
+  const handleTableReorder = useCallback(({ columnKey, fromIndex, targetIndex }) => {
+    moveFileItem(tableScope, columnKey, fromIndex, targetIndex)
+  }, [moveFileItem, tableScope])
 
   // 切换配置标签状态
   const handleCycleSubtitleConfig = useCallback((key, options) => {
@@ -79,7 +85,9 @@ export function SubtitleRename() {
                     ...(config?.subtitle?.detect_language ? [{ key: "tc", title: "繁体字幕" }] : [])
                   ]}
                   data={tableData}
+                  cellIds={fileData}
                   onContextMenu={setCell}
+                  onReorder={handleTableReorder}
                 />
               )
             : (
