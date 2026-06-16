@@ -1,7 +1,7 @@
 import { readDir, readFile, stat } from "@tauri-apps/plugin-fs"
 import { invoke } from "@tauri-apps/api/core"
 import { extname, basename, join } from "@tauri-apps/api/path"
-import { getConfig } from "@/utils/config"
+import { useConfigStore } from "@/store/config"
 import { toast } from "@/components/toast"
 
 // 简繁语言集合
@@ -51,7 +51,7 @@ const TC_EXTENSIONS = new Set([
 ])
 
 export async function detectFiles(paths, fileList, archiveList) {
-  const config = await getConfig()
+  const config = await useConfigStore.getState().getConfig()
   const newFiles = { video: [], sc: [], tc: [] }
   const allFiles = []
   const archives = []

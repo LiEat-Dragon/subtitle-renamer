@@ -1,6 +1,6 @@
 import { appDataDir } from "@tauri-apps/api/path"
 import { openPath } from "@tauri-apps/plugin-opener"
-import { resetConfig } from "@/utils/config"
+import { useConfigStore } from "@/store/config"
 import { clearTableWidths } from "@/utils/storage"
 import { SettingsContent, SettingsTitle, SettingsCard, SettingsItem } from "@/components/settings"
 import { toast } from "@/components/toast"
@@ -8,6 +8,8 @@ import { Button } from "@/components/button"
 import { FolderOpenIcon, ArrowClockwiseIcon, BellRingingIcon, TableIcon } from "@phosphor-icons/react"
 
 export function DeveloperSetting() {
+  const resetConfig = useConfigStore((s) => s.resetConfig)
+
   const handleOpenConfig = async () => {
     try {
       const configDir = await appDataDir()

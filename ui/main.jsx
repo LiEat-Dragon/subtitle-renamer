@@ -5,7 +5,6 @@ import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
 import { HashRouter, Routes, Route, Navigate } from "react-router-dom"
 import { Toaster } from "sonner"
-import { initConfig, getConfig } from "@/utils/config"
 import { AppWindow, TitleBar, MainContent } from "@/components/window.jsx"
 import { Nav, NavButton, NavSpace, NavUpgrade } from "@/components/nav.jsx"
 import { SubtitleRename } from "@/pages/subtitle-rename"
@@ -20,9 +19,7 @@ import { SubtitlesIcon, GearSixIcon, DownloadSimpleIcon } from "@phosphor-icons/
 import { useConfigStore } from "@/store/config"
 
 // 初始化配置和主题模式
-initConfig().then(async () => {
-  const config = await getConfig()
-  useConfigStore.getState().hydrate(config)
+useConfigStore.getState().initConfig().then(async (config) => {
   await invoke("set_theme", { theme: config.general.theme })
 })
 

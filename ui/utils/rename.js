@@ -2,13 +2,13 @@ import chardet from "chardet"
 import { dirname, join, extname, basename, appConfigDir } from "@tauri-apps/api/path"
 import { copyFile, remove, rename, exists, readFile, writeFile } from "@tauri-apps/plugin-fs"
 import { invoke } from "@tauri-apps/api/core"
-import { getConfig } from "@/utils/config"
+import { useConfigStore } from "@/store/config"
 import { elapsedTime } from "@/utils/time"
 import { toast } from "@/components/toast"
 
 export async function renameSubtitles(fileData, archiveList) {
   const startTime = Date.now()
-  const config = await getConfig()
+  const config = await useConfigStore.getState().getConfig()
   const videoRows = fileData.filter((row) => row.video)
   const scRows = fileData.filter((row) => row.sc)
   const tcRows = fileData.filter((row) => row.tc)
