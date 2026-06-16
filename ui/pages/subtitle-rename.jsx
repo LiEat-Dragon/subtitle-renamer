@@ -1,7 +1,6 @@
 import { useState, useCallback, useEffect } from "react"
 import { useConfigStore } from "@/store/config"
 import { useTableStore } from "@/store/table"
-import { Link } from "react-router-dom"
 import { renameSubtitles } from "@/utils/rename"
 import { addDroppedFiles } from "@/utils/drop"
 import { createSubtitleTableData } from "@/utils/highlight"
@@ -14,7 +13,7 @@ import { Table } from "@/components/table"
 import { Button } from "@/components/button"
 import { Badge } from "@/components/badge"
 import { Combobox } from "@/components/combobox"
-import { FileVideoIcon, FileTextIcon, FileArchiveIcon, FolderIcon, GearIcon } from "@phosphor-icons/react"
+import { FileVideoIcon, FileTextIcon, FileArchiveIcon, FolderIcon } from "@phosphor-icons/react"
 
 export function SubtitleRename() {
   const tableScope = "rename"
@@ -130,11 +129,6 @@ export function SubtitleRename() {
           )}
         </div>
 
-        <Link to="/settings/rename" draggable={false}>
-          <Button className="w-8 p-0">
-            <GearIcon className="size-4" />
-          </Button>
-        </Link>
         <Button className="w-26" onClick={() => clearAll(tableScope)}>清空列表</Button>
         <Button variant="primary" className="w-26" onClick={handleRename}>重命名</Button>
       </PageBlock>

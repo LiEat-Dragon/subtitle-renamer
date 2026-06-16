@@ -4,7 +4,6 @@ import { useConfigStore } from "@/store/config"
 import { useTableStore } from "@/store/table"
 import { useDownloadStore } from "@/store/download"
 import { useListen } from "@/hooks/use-listen"
-import { Link } from "react-router-dom"
 import { renameSubtitles } from "@/utils/rename"
 import { addDroppedFiles } from "@/utils/drop"
 import { createSubtitleTableData } from "@/utils/highlight"
@@ -22,7 +21,7 @@ import { Combobox } from "@/components/combobox"
 import { Input } from "@/components/input"
 import { Select } from "@/components/select"
 import { cn } from "@/utils/cn"
-import { FileVideoIcon, FileArchiveIcon, FolderIcon, GearIcon, DownloadSimpleIcon, MagnifyingGlassIcon, ShieldChevronIcon, WarningDiamondIcon, EmptyIcon } from "@phosphor-icons/react"
+import { FileVideoIcon, FileArchiveIcon, FolderIcon, DownloadSimpleIcon, MagnifyingGlassIcon, ShieldChevronIcon, WarningDiamondIcon, EmptyIcon } from "@phosphor-icons/react"
 
 const postFileSortOptions = [
   { value: "default", label: "默认" },
@@ -407,11 +406,6 @@ export function SubtitleDownload() {
           )}
         </div>
 
-        <Link to="/settings/rename" draggable={false}>
-          <Button className="w-8 p-0">
-            <GearIcon className="size-4" />
-          </Button>
-        </Link>
         <Button className="w-26" onClick={() => clearAll(tableScope)}>清空列表</Button>
         <Button variant="primary" className="w-26" onClick={handleRename}>重命名</Button>
       </PageBlock>
