@@ -1,0 +1,72 @@
+import { useEffect, useState } from "react"
+import { appConfigDir, dirname, join } from "@tauri-apps/api/path"
+import { open } from "@tauri-apps/plugin-dialog"
+import { exists } from "@tauri-apps/plugin-fs"
+import { openPath } from "@tauri-apps/plugin-opener"
+import { useConfigStore } from "@/store/config"
+import { SettingsContent, SettingsTitle, SettingsCard, SettingsItem } from "@/components/settings"
+import { Button } from "@/components/button"
+import { toast } from "@/components/toast"
+import { FolderOpenIcon } from "@phosphor-icons/react"
+
+export function DownloadSetting() {
+  const [defaultDirectory, setDefaultDirectory] = useState("")
+
+  const config = useConfigStore((s) => s.config)
+  const saveConfig = useConfigStore((s) => s.saveConfig)
+
+  // 获取默认下载目录
+  useEffect(() => {
+    const loadDefaultDirectory = async () => {
+      setDefaultDirectory(await join(await appConfigDir(), "cache"))
+    }
+    loadDefaultDirectory()
+  }, [])
+
+  if (!config) return null
+
+  const handleChooseDirectory = async () => {
+    try {
+      const selected = await open({
+        directory: true,
+        multiple: false,
+        defaultPath: config?.download?.directory || defaultDirectory
+      })
+      if (selected) await saveConfig("download", "directory", selected)
+    } catch (error) {
+      toast.error({ title: "文件夹选择失败", description: error.message || String(error) })
+    }
+  }
+
+  const handleOpenDirectory = async () => {
+    try {
+      const directoryExists = await exists(config?.download?.directory || defaultDirectory)
+      await openPath(
+        directoryExists
+          ? config?.download?.directory || defaultDirectory
+          : await dirname(config?.download?.directory || defaultDirectory)
+      )
+    } catch (error) {
+      toast.error({ title: "文件夹打开失败", description: error.message || String(error) })
+    }
+  }
+
+  return (
+    <SettingsContent>
+      <SettingsTitle title="下载" />
+
+      <SettingsCard>
+        <SettingsItem
+          title="下载位置"
+          subtitle={`字幕附件的保存目录。当前路径：${config?.download?.directory || defaultDirectory}`}
+          icon={<FolderOpenIcon />}
+        >
+          <div className="flex gap-2">
+            <Button onClick={handleChooseDirectory}>选择文件夹</Button>
+            <Button onClick={handleOpenDirectory}>打开</Button>
+          </div>
+        </SettingsItem>
+      </SettingsCard>
+    </SettingsContent>
+  )
+}

@@ -67,3 +67,19 @@
   .markdown-content ol { @apply list-decimal pl-5; }
   .markdown-content li { @apply my-1; }
 }
+
+@layer utilities {
+  @keyframes orbit {
+    from {
+      transform: rotate(0deg) translateX(5px) rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg) translateX(5px) rotate(-360deg);
+    }
+  }
+
+  .orbit-icon {
+    transform-origin: center;
+    animation: orbit 1.5s linear infinite;
+  }
+}

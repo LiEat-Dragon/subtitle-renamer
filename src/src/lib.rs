@@ -1,3 +1,4 @@
+mod browser;
 mod extract;
 mod file_time;
 #[cfg(target_os = "macos")]
@@ -33,6 +34,26 @@ fn modify_time(source_path: String, target_path: String) -> Result<(), String> {
     file_time::modify_time_inner(&source_path, &target_path).map_err(|e| e.to_string())
 }
 
+#[tauri::command]
+fn open_challenge(app: AppHandle) -> Result<(), String> {
+    browser::open_challenge_inner(app)
+}
+
+#[tauri::command]
+fn search_posts(app: AppHandle, query: String) -> Result<(), String> {
+    browser::search_posts_inner(app, &query)
+}
+
+#[tauri::command]
+fn get_post(app: AppHandle, post_url: String) -> Result<(), String> {
+    browser::get_post_inner(app, &post_url)
+}
+
+#[tauri::command]
+fn download_subtitle(app: AppHandle, file_url: String) -> Result<(), String> {
+    browser::download_subtitle_inner(app, &file_url)
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     Builder::default()
@@ -52,7 +73,11 @@ pub fn run() {
             set_theme,
             extract_archive,
             move_to_trash,
-            modify_time
+            modify_time,
+            open_challenge,
+            search_posts,
+            get_post,
+            download_subtitle
         ])
         .setup(|app| {
             let window = app.get_webview_window("main").unwrap();

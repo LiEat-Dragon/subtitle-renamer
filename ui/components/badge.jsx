@@ -6,14 +6,12 @@ export function Badge({ children, variant = "default", className, onClick, ...pr
     outline: "border-muted/80 text-primary/80"
   }
 
-  const buttonClassName = onClick && "hover:bg-background-dark/50 hover:border-muted cursor-pointer"
-
   return (
     <span
       className={cn(
-        "flex-center h-7 px-4 border text-[13px] rounded-full transition",
+        "flex-center gap-1 h-7 px-4 border text-[13px] rounded-full transition",
+        onClick && "hover:bg-background-dark/50 hover:border-muted cursor-pointer",
         variants[variant],
-        buttonClassName,
         className
       )}
       onClick={onClick}

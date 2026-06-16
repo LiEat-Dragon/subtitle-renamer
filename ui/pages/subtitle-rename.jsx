@@ -1,12 +1,10 @@
-import { basename } from "@tauri-apps/api/path"
 import { useState, useCallback, useEffect } from "react"
 import { useConfigStore } from "@/store/config"
-import { useSubtitleStore } from "@/store/subtitle"
+import { useTableStore } from "@/store/table"
 import { Link } from "react-router-dom"
-import { detectFiles } from "@/utils/detect"
 import { renameSubtitles } from "@/utils/rename"
-import { elapsedTime } from "@/utils/time"
-import { highlightDiff } from "@/utils/highlight"
+import { addDroppedFiles } from "@/utils/drop"
+import { createSubtitleTableData } from "@/utils/highlight"
 import { moveSubOptions, removeSubOptions } from "@/pages/settings-rename"
 import { SubtitleTableContextMenu } from "@/contexts/subtitle-table"
 import { toast } from "@/components/toast"
@@ -19,48 +17,25 @@ import { Combobox } from "@/components/combobox"
 import { FileVideoIcon, FileTextIcon, FileArchiveIcon, FolderIcon, GearIcon } from "@phosphor-icons/react"
 
 export function SubtitleRename() {
+  const tableScope = "rename"
   const [cell, setCell] = useState(null)
   const [fileData, setFileData] = useState([]) // 展平为带路径的数组，用于重命名
   const [tableData, setTableData] = useState([]) // 上面数组的基础上移除了路径，只保留文件名
 
   const config = useConfigStore((s) => s.config)
   const saveConfig = useConfigStore((s) => s.saveConfig)
+  const fileList = useTableStore((s) => s.rename.fileList)
+  const archiveList = useTableStore((s) => s.rename.archiveList)
+  const setFileList = useTableStore((s) => s.setFileList)
+  const setArchiveList = useTableStore((s) => s.setArchiveList)
+  const clearAll = useTableStore((s) => s.clearAll)
 
-  const tableColumns = [
-    { key: "video", title: "视频文件" },
-    { key: "sc", title: config?.subtitle?.detect_language ? "简体字幕" : "字幕文件" },
-    ...(config?.subtitle?.detect_language ? [{ key: "tc", title: "繁体字幕" }] : [])
-  ]
-  const fileList = useSubtitleStore((s) => s.fileList)
-  const archiveList = useSubtitleStore((s) => s.archiveList)
-  const setFileList = useSubtitleStore((s) => s.setFileList)
-  const setArchiveList = useSubtitleStore((s) => s.setArchiveList)
-  const clearAll = useSubtitleStore((s) => s.clearAll)
-
+  // 将文件列表转换为表格数据，并根据配置决定是否高亮差异
   useEffect(() => {
     const processData = async () => {
-      const entries = Object.entries(fileList)
-      const maxLength = Math.max(0, ...entries.map(([, v]) => v?.length || 0))
-
-      const data = Array.from({ length: maxLength }, (_, i) =>
-        Object.fromEntries(entries.map(([k, v]) => [k, v?.[i] || ""]))
-      )
-
-      const result = await Promise.all(
-        data.map((row) =>
-          Promise.all(
-            Object.entries(row).map(async ([k, v]) => [k, v ? await basename(v) : ""])
-          ).then(Object.fromEntries)
-        )
-      )
-
-      if (config?.subtitle?.highlight_diff) {
-        setFileData(data)
-        setTableData(highlightDiff(result, config.subtitle.highlight_ignore_case, config.subtitle.highlight_numbers_only))
-      } else {
-        setFileData(data)
-        setTableData(result)
-      }
+      const data = await createSubtitleTableData(fileList, config)
+      setFileData(data.fileData)
+      setTableData(data.tableData)
     }
     processData()
   }, [fileList, config])
@@ -68,33 +43,13 @@ export function SubtitleRename() {
   // 拖拽添加文件
   const handleFileDrop = useCallback(async (paths) => {
     if (!paths || paths.length === 0) return
-
-    const dropPromise = (async () => {
-      const startTime = Date.now()
-      const { files, archives, addedCount, filteredCount, duplicateCount, excludedCount, skippedFolderCount } = await detectFiles(paths, fileList, archiveList)
-
-      const reasons = []
-      if (filteredCount > 0) reasons.push(`${filteredCount} 个无效文件`)
-      if (duplicateCount > 0) reasons.push(`${duplicateCount} 个重复文件`)
-      if (excludedCount > 0) reasons.push(`${excludedCount} 个设置中排除的文件`)
-      if (skippedFolderCount > 0) reasons.push(`${skippedFolderCount} 个跳过的文件夹`)
-      const filterText = reasons.length ? `过滤了 ${reasons.join("和 ")}` : ""
-
-      if (addedCount === 0) {
-        throw new Error(`${filterText || "没有可添加的文件"}，耗时 ${elapsedTime(startTime)}`)
-      } else {
-        setFileList(() => files)
-        setArchiveList(() => archives)
-        return { message: `添加了 ${addedCount} 个文件${filterText && `，${filterText}`}，耗时 ${elapsedTime(startTime)}` }
-      }
-    })()
-
+    const dropPromise = addDroppedFiles(paths, fileList, archiveList, tableScope, setFileList, setArchiveList)
     toast.promise(dropPromise, {
       loading: { title: "正在添加文件" },
       success: { title: (data) => data.message, duration: 1000 },
       error: { type: "warning", title: (error) => error.message || String(error) }
     })
-  }, [fileList, archiveList, setFileList, setArchiveList])
+  }, [fileList, archiveList, setFileList, setArchiveList, tableScope])
 
   // 切换配置标签状态
   const handleCycleSubtitleConfig = useCallback((key, options) => {
@@ -107,18 +62,26 @@ export function SubtitleRename() {
   // 重命名字幕
   const handleRename = async () => {
     const success = await renameSubtitles(fileData, archiveList)
-    if (success) clearAll()
+    if (success) clearAll(tableScope)
   }
 
   return (
     <Page className="flex flex-col h-screen bg-transparent">
-      <SubtitleTableContextMenu cell={cell} fileData={fileData} onClose={() => setCell(null)} />
+      <SubtitleTableContextMenu cell={cell} fileData={fileData} tableScope={tableScope} onClose={() => setCell(null)} />
 
       <PageBlock className="flex-1">
         <DropArea title="松手以添加所选内容" onFileDrop={handleFileDrop}>
           {tableData.length > 0
             ? (
-                <Table columns={tableColumns} data={tableData} onContextMenu={setCell} />
+                <Table
+                  columns={[
+                    { key: "video", title: "视频文件" },
+                    { key: "sc", title: config?.subtitle?.detect_language ? "简体字幕" : "字幕文件" },
+                    ...(config?.subtitle?.detect_language ? [{ key: "tc", title: "繁体字幕" }] : [])
+                  ]}
+                  data={tableData}
+                  onContextMenu={setCell}
+                />
               )
             : (
                 <div className="flex-1 flex-center flex-col gap-3 text-secondary">
@@ -172,7 +135,7 @@ export function SubtitleRename() {
             <GearIcon className="size-4" />
           </Button>
         </Link>
-        <Button className="w-26" onClick={() => clearAll()}>清空列表</Button>
+        <Button className="w-26" onClick={() => clearAll(tableScope)}>清空列表</Button>
         <Button variant="primary" className="w-26" onClick={handleRename}>重命名</Button>
       </PageBlock>
     </Page>

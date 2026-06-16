@@ -3,18 +3,17 @@ import { openPath } from "@tauri-apps/plugin-opener"
 import { writeText } from "@tauri-apps/plugin-clipboard-manager"
 import { useCallback } from "react"
 import { useConfigStore } from "@/store/config"
-import { useSubtitleStore } from "@/store/subtitle"
-import { sortFiles } from "@/utils/sort"
+import { useTableStore } from "@/store/table"
 import { toast } from "@/components/toast"
 import { ContextMenu, ContextItem, ContextSeparator } from "@/components/context-menu"
 import { ArrowsClockwiseIcon, ArrowFatUpIcon, FileMinusIcon, StackMinusIcon, FolderOpenIcon, CopyIcon, PathIcon } from "@phosphor-icons/react"
 
 const colKeys = ["video", "sc", "tc"]
 
-export function SubtitleTableContextMenu({ cell, fileData, onClose }) {
+export function SubtitleTableContextMenu({ cell, fileData, tableScope, onClose }) {
   const config = useConfigStore((s) => s.config)
-  const fileList = useSubtitleStore((s) => s.fileList)
-  const setFileList = useSubtitleStore((s) => s.setFileList)
+  const fileList = useTableStore((s) => s[tableScope].fileList)
+  const setFileList = useTableStore((s) => s.setFileList)
 
   const handleOpenLocation = useCallback(async () => {
     try {
@@ -48,39 +47,39 @@ export function SubtitleTableContextMenu({ cell, fileData, onClose }) {
     const sourceKey = colKeys[cell.col]
     const targetKey = cell.col === 1 ? "tc" : "sc"
     const value = fileList[sourceKey]?.[cell.row]
-    setFileList((prev) => ({
+    setFileList(tableScope, (prev) => ({
       ...prev,
       [sourceKey]: (prev[sourceKey] || []).filter((_, i) => i !== cell.row),
-      [targetKey]: [...(prev[targetKey] || []), value].sort(sortFiles)
+      [targetKey]: [...(prev[targetKey] || []), value].sort((a, b) => a.localeCompare(b, "zh-CN", { numeric: true }))
     }))
-  }, [cell, fileList, setFileList])
+  }, [cell, fileList, setFileList, tableScope])
 
   const handleMove = useCallback((offset) => {
     const key = colKeys[cell.col]
     const targetRow = cell.row + offset
-    setFileList((prev) => ({
+    setFileList(tableScope, (prev) => ({
       ...prev,
       [key]: prev[key].map((v, i) =>
         i === cell.row ? prev[key][targetRow] : i === targetRow ? prev[key][cell.row] : v
       )
     }))
-  }, [cell, setFileList])
+  }, [cell, setFileList, tableScope])
 
   const handleDeleteItem = useCallback(() => {
     const key = colKeys[cell.col]
-    setFileList((prev) => ({
+    setFileList(tableScope, (prev) => ({
       ...prev,
       [key]: prev[key].filter((_, i) => i !== cell.row)
     }))
-  }, [cell, setFileList])
+  }, [cell, setFileList, tableScope])
 
   const handleDeleteRow = useCallback(() => {
-    setFileList((prev) =>
+    setFileList(tableScope, (prev) =>
       Object.fromEntries(
         Object.entries(prev).map(([key, arr]) => [key, arr.filter((_, i) => i !== cell.row)])
       )
     )
-  }, [cell, setFileList])
+  }, [cell, setFileList, tableScope])
 
   const colData = cell ? fileList[colKeys[cell.col]] || [] : []
   const hasContent = cell && !!colData[cell.row]

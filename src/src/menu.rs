@@ -24,6 +24,11 @@ pub fn create_menu(app: &App) -> Result<Menu<tauri::Wry>, Box<dyn std::error::Er
                 .accelerator("Cmd+1")
                 .build(app)?,
         )
+        .item(
+            &MenuItemBuilder::with_id("download", "字幕下载")
+                .accelerator("Cmd+2")
+                .build(app)?,
+        )
         .build()?;
 
     let window_menu = SubmenuBuilder::new(app, "窗口")
@@ -51,6 +56,9 @@ pub fn create_menu(app: &App) -> Result<Menu<tauri::Wry>, Box<dyn std::error::Er
         }
         "renamer" => {
             let _ = app.emit("navigate", "/");
+        }
+        "download" => {
+            let _ = app.emit("navigate", "/download");
         }
         _ => {}
     });

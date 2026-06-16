@@ -1,4 +1,28 @@
+import { basename } from "@tauri-apps/api/path"
 import { diffChars } from "diff"
+
+export async function createSubtitleTableData(fileList, config) {
+  const entries = Object.entries(fileList)
+  const maxLength = Math.max(0, ...entries.map(([, v]) => v?.length || 0))
+
+  const fileData = Array.from({ length: maxLength }, (_, i) =>
+    Object.fromEntries(entries.map(([k, v]) => [k, v?.[i] || ""]))
+  )
+
+  const basenameData = await Promise.all(
+    fileData.map((row) =>
+      Promise.all(
+        Object.entries(row).map(async ([k, v]) => [k, v ? await basename(v) : ""])
+      ).then(Object.fromEntries)
+    )
+  )
+
+  const tableData = config?.subtitle?.highlight_diff
+    ? highlightDiff(basenameData, config.subtitle.highlight_ignore_case, config.subtitle.highlight_numbers_only)
+    : basenameData
+
+  return { fileData, tableData }
+}
 
 // 比较同列文件名的差异并高亮
 export function highlightDiff(data, ignoreCase, numbersOnly) {

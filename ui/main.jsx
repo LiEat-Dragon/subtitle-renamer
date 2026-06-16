@@ -8,13 +8,15 @@ import { Toaster } from "sonner"
 import { initConfig, getConfig } from "@/utils/config"
 import { AppWindow, TitleBar, MainContent } from "@/components/window.jsx"
 import { Nav, NavButton, NavSpace, NavUpgrade } from "@/components/nav.jsx"
-import { SubtitleRename } from "@/pages/subtitle"
+import { SubtitleRename } from "@/pages/subtitle-rename"
+import { SubtitleDownload } from "@/pages/subtitle-download"
 import { Settings } from "@/pages/settings"
 import { GeneralSetting } from "@/pages/settings-general"
 import { RenameSetting } from "@/pages/settings-rename"
+import { DownloadSetting } from "@/pages/settings-download"
 import { DeveloperSetting } from "@/pages/settings-developer"
 import { AboutSetting } from "@/pages/settings-about"
-import { SubtitlesIcon, GearSixIcon } from "@phosphor-icons/react"
+import { SubtitlesIcon, GearSixIcon, DownloadSimpleIcon } from "@phosphor-icons/react"
 import { useConfigStore } from "@/store/config"
 
 // 初始化配置和主题模式
@@ -45,6 +47,7 @@ createRoot(document.getElementById("root")).render(
         <MainContent>
           <Nav>
             <NavButton path="/" title="字幕命名" icon={<SubtitlesIcon />} />
+            <NavButton path="/download" title="字幕下载" icon={<DownloadSimpleIcon />} />
             <NavSpace />
             <NavUpgrade />
             <NavButton path="/settings" title="设置" icon={<GearSixIcon />} />
@@ -52,10 +55,12 @@ createRoot(document.getElementById("root")).render(
 
           <Routes>
             <Route path="/" element={<SubtitleRename />} />
+            <Route path="/download" element={<SubtitleDownload />} />
             <Route path="/settings" element={<Settings />}>
               <Route index element={<Navigate to="general" replace />} />
               <Route path="general" element={<GeneralSetting />} />
               <Route path="rename" element={<RenameSetting />} />
+              <Route path="download" element={<DownloadSetting />} />
               <Route path="developer" element={<DeveloperSetting />} />
               <Route path="about" element={<AboutSetting />} />
             </Route>

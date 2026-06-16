@@ -30,6 +30,9 @@ const DEFAULT_CONFIG = {
     move_sub: "cut",
     remove_sub: "none",
     remove_zip: true
+  },
+  download: {
+    directory: ""
   }
 }
 

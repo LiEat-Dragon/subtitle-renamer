@@ -13,11 +13,12 @@ export function Button({ variant = "default", disabled, children, className, ...
   return (
     <button
       className={cn(
-        "flex-center gap-2 h-8 px-3 border rounded-sm cursor-pointer transition shrink-0",
+        "flex-center gap-2 h-8 px-4 border rounded-sm cursor-pointer transition shrink-0",
         disabled && "cursor-not-allowed",
         itemVarient[variant],
         className
       )}
+      disabled={disabled}
       {...props}
     >
       {children}

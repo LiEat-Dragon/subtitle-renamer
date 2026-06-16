@@ -2,7 +2,6 @@ import { readDir, readFile, stat } from "@tauri-apps/plugin-fs"
 import { invoke } from "@tauri-apps/api/core"
 import { extname, basename, join } from "@tauri-apps/api/path"
 import { getConfig } from "@/utils/config"
-import { sortFiles } from "@/utils/sort"
 import { toast } from "@/components/toast"
 
 // 简繁语言集合
@@ -25,7 +24,7 @@ const VIDEO_EXTENSIONS = new Set([
 ])
 
 // 字幕格式
-const SUBTITLE_EXTENSIONS = new Set([
+export const SUBTITLE_EXTENSIONS = new Set([
   "ass", "ssa",
   "srt", "vtt",
   "sub", "idx",
@@ -34,7 +33,7 @@ const SUBTITLE_EXTENSIONS = new Set([
 ])
 
 // 压缩包格式
-const ARCHIVE_EXTENSIONS = new Set([
+export const ARCHIVE_EXTENSIONS = new Set([
   "zip", "7z", "rar"
 ])
 
@@ -177,7 +176,7 @@ export async function detectFiles(paths, fileList, archiveList) {
   const files = Object.fromEntries(
     Object.entries(newFiles).map(([type, arr]) => [
       type,
-      [...(fileList[type] || []), ...arr].sort(sortFiles)
+      [...(fileList[type] || []), ...arr].sort((a, b) => a.localeCompare(b, "zh-CN", { numeric: true }))
     ])
   )
 
@@ -194,7 +193,7 @@ export async function detectFiles(paths, fileList, archiveList) {
 
 async function collectDirectoryFiles(directoryPath, recursive) {
   const files = []
-  const entries = (await readDir(directoryPath)).sort((a, b) => sortFiles(a.name, b.name))
+  const entries = (await readDir(directoryPath)).sort((a, b) => a.name.localeCompare(b.name, "zh-CN", { numeric: true }))
 
   for (const entry of entries) {
     if (entry.name.startsWith(".") || entry.name === "__MACOSX") continue
