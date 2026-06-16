@@ -53,6 +53,10 @@
     @apply cursor-default;
   }
 
+  input {
+    @apply select-text cursor-text;
+  }
+
   .flex-center {
     @apply flex items-center justify-center;
   }

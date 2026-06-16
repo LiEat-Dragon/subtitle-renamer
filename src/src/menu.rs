@@ -31,6 +31,16 @@ pub fn create_menu(app: &App) -> Result<Menu<tauri::Wry>, Box<dyn std::error::Er
         )
         .build()?;
 
+    let edit_menu = SubmenuBuilder::new(app, "编辑")
+        .item(&PredefinedMenuItem::undo(app, Some("撤销"))?)
+        .item(&PredefinedMenuItem::redo(app, Some("重做"))?)
+        .separator()
+        .item(&PredefinedMenuItem::cut(app, Some("剪切"))?)
+        .item(&PredefinedMenuItem::copy(app, Some("复制"))?)
+        .item(&PredefinedMenuItem::paste(app, Some("粘贴"))?)
+        .item(&PredefinedMenuItem::select_all(app, Some("全选"))?)
+        .build()?;
+
     let window_menu = SubmenuBuilder::new(app, "窗口")
         .item(&PredefinedMenuItem::minimize(app, Some("最小化"))?)
         .item(&PredefinedMenuItem::maximize(app, Some("最大化"))?)
@@ -40,6 +50,7 @@ pub fn create_menu(app: &App) -> Result<Menu<tauri::Wry>, Box<dyn std::error::Er
 
     let menu = MenuBuilder::new(app)
         .item(&app_menu)
+        .item(&edit_menu)
         .item(&func_menu)
         .item(&window_menu)
         .build()?;
