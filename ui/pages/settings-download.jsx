@@ -7,7 +7,7 @@ import { useConfigStore } from "@/store/config"
 import { SettingsContent, SettingsTitle, SettingsCard, SettingsItem } from "@/components/settings"
 import { Button } from "@/components/button"
 import { toast } from "@/components/toast"
-import { FolderOpenIcon } from "@phosphor-icons/react"
+import { DownloadSimpleIcon } from "@phosphor-icons/react"
 
 export function DownloadSetting() {
   const [defaultDirectory, setDefaultDirectory] = useState("")
@@ -59,7 +59,7 @@ export function DownloadSetting() {
         <SettingsItem
           title="下载位置"
           subtitle={`字幕附件的保存目录。当前路径：${config?.download_directory || defaultDirectory}`}
-          icon={<FolderOpenIcon />}
+          icon={<DownloadSimpleIcon />}
         >
           <div className="flex gap-2">
             <Button onClick={handleChooseDirectory}>选择文件夹</Button>

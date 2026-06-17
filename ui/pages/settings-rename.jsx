@@ -3,7 +3,7 @@ import { SettingsContent, SettingsTitle, SettingsCard, SettingsItem } from "@/co
 import { Select } from "@/components/select"
 import { Combobox } from "@/components/combobox"
 import { Switch } from "@/components/switch"
-import { TagIcon, HighlighterIcon, ArrowsClockwiseIcon, FoldersIcon, FolderMinusIcon, ProhibitIcon, TextAaIcon, CopyIcon, TrashIcon, FileArchiveIcon, FileDashedIcon } from "@phosphor-icons/react"
+import { FoldersIcon, ProhibitIcon, TextAaIcon, CopyIcon, TrashIcon, FileArchiveIcon, FileDashedIcon, FolderSimpleDashedIcon, GlobeIcon, GlobeSimpleIcon } from "@phosphor-icons/react"
 import { Input } from "@/components/input"
 
 export const moveSubOptions = [
@@ -25,73 +25,7 @@ export function RenameSetting() {
 
   return (
     <SettingsContent>
-      <SettingsTitle title="内容显示" />
-
-      <SettingsCard>
-        <SettingsItem title="显示配置标签" subtitle="在界面左下角显示主要配置状态的标签" icon={<TagIcon />} />
-        <SettingsItem title="显示统一后缀编辑框" subtitle="在首页显示统一后缀的快捷编辑框">
-          <Switch
-            checked={config?.config_quick_union_extension}
-            onChange={(checked) => saveConfig("config_quick_union_extension", checked)}
-          />
-        </SettingsItem>
-        <SettingsItem title="显示统一后缀名" subtitle="在配置标签中显示统一后缀名">
-          <Switch
-            checked={config?.config_badge_union_extension}
-            onChange={(checked) => saveConfig("config_badge_union_extension", checked)}
-          />
-        </SettingsItem>
-        <SettingsItem title="显示移动字幕选项" subtitle="在配置标签中显示移动字幕的状态选项">
-          <Switch
-            checked={config?.config_badge_move_sub}
-            onChange={(checked) => saveConfig("config_badge_move_sub", checked)}
-          />
-        </SettingsItem>
-        <SettingsItem title="显示删除字幕选项" subtitle="在配置标签中显示删除字幕的状态选项">
-          <Switch
-            checked={config?.config_badge_remove_sub}
-            onChange={(checked) => saveConfig("config_badge_remove_sub", checked)}
-          />
-        </SettingsItem>
-      </SettingsCard>
-
-      <SettingsCard>
-        <SettingsItem title="高亮文件名差异" subtitle="在表格中加粗显示同列文件名之间的差异部分" icon={<HighlighterIcon />}>
-          <Switch
-            checked={config?.highlight_diff}
-            onChange={(checked) => saveConfig("highlight_diff", checked)}
-          />
-        </SettingsItem>
-        <SettingsItem title="忽略大小写" subtitle="对比差异时忽略字母大小写">
-          <Switch
-            checked={config?.highlight_ignore_case}
-            onChange={(checked) => saveConfig("highlight_ignore_case", checked)}
-          />
-        </SettingsItem>
-        <SettingsItem title="只对比数字" subtitle="只高亮显示数字部分的差异，忽略其他字符">
-          <Switch
-            checked={config?.highlight_numbers_only}
-            onChange={(checked) => saveConfig("highlight_numbers_only", checked)}
-          />
-        </SettingsItem>
-      </SettingsCard>
-
       <SettingsTitle title="文件添加" />
-
-      <SettingsCard>
-        <SettingsItem title="简繁识别" subtitle="添加文件时，自动识别字幕语言为简体或繁体。禁用后，所有字幕均视作简体字幕" icon={<ArrowsClockwiseIcon />}>
-          <Switch
-            checked={config?.detect_language}
-            onChange={(checked) => saveConfig("detect_language", checked)}
-          />
-        </SettingsItem>
-        <SettingsItem title="轻量识别" subtitle="优先根据文件名中的 sc/tc/chs/cht 等扩展名识别简繁类型，匹配失败再通过内容进行识别">
-          <Switch
-            checked={config?.lite_detect}
-            onChange={(checked) => saveConfig("lite_detect", checked)}
-          />
-        </SettingsItem>
-      </SettingsCard>
 
       <SettingsItem title="文件夹递归" subtitle="拖入文件夹时，继续识别所有子文件夹中的视频和字幕" icon={<FoldersIcon />}>
         <Switch
@@ -100,7 +34,7 @@ export function RenameSetting() {
         />
       </SettingsItem>
 
-      <SettingsItem title="文件夹过滤" subtitle="同时拖入包含视频、字幕或压缩包的多种文件时，自动排除文件夹" icon={<FolderMinusIcon />}>
+      <SettingsItem title="文件夹过滤" subtitle="同时拖入包含视频、字幕或压缩包的多种文件时，自动排除文件夹" icon={<FolderSimpleDashedIcon />}>
         <Switch
           checked={config?.skip_folder_mixed}
           onChange={(checked) => saveConfig("skip_folder_mixed", checked)}
@@ -125,6 +59,26 @@ export function RenameSetting() {
             onChange={(e) => saveConfig("exclude_subtitle", e.target.value)}
             placeholder="不排除字幕"
             className="w-72"
+          />
+        </SettingsItem>
+      </SettingsCard>
+
+      <SettingsTitle title="字幕识别" />
+
+      <SettingsCard>
+        <SettingsItem title="简繁识别" subtitle="添加文件时，自动识别字幕语言为简体或繁体。禁用后，所有字幕均视作简体字幕" icon={<GlobeIcon />}>
+          <Switch
+            checked={config?.detect_language}
+            onChange={(checked) => saveConfig("detect_language", checked)}
+          />
+        </SettingsItem>
+      </SettingsCard>
+
+      <SettingsCard>
+        <SettingsItem title="轻量识别" subtitle="优先根据文件名中的 sc/tc/chs/cht 等扩展名识别简繁类型，匹配失败再通过内容进行识别" icon={<GlobeSimpleIcon />}>
+          <Switch
+            checked={config?.lite_detect}
+            onChange={(checked) => saveConfig("lite_detect", checked)}
           />
         </SettingsItem>
       </SettingsCard>
@@ -171,7 +125,7 @@ export function RenameSetting() {
         </SettingsItem>
       </SettingsCard>
 
-      <SettingsTitle title="字幕后缀" />
+      <SettingsTitle title="后缀" />
 
       <SettingsCard>
         <SettingsItem title="统一后缀" subtitle="重命名字幕时，在扩展名前为所有语言字幕添加后缀" icon={<FileDashedIcon />}>

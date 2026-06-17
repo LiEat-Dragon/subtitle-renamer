@@ -3,6 +3,7 @@ import { load } from "@tauri-apps/plugin-store"
 import { create } from "zustand"
 
 const DEFAULT_CONFIG = {
+  // 通用
   window_theme: "system",
   window_vibrancy: true,
   remember_window: true,
@@ -13,6 +14,8 @@ const DEFAULT_CONFIG = {
   highlight_diff: true,
   highlight_ignore_case: false,
   highlight_numbers_only: false,
+
+  // 重命名
   detect_language: true,
   detect_folder_recursively: false,
   skip_folder_mixed: true,
@@ -29,6 +32,8 @@ const DEFAULT_CONFIG = {
   move_sub: "cut",
   remove_sub: "none",
   remove_zip: true,
+
+  // 字幕下载
   download_directory: ""
 }
 

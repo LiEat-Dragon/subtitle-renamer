@@ -74,28 +74,24 @@ export function DeveloperSetting() {
         </SettingsItem>
       </SettingsCard>
 
-      {import.meta.env.DEV && (
-        <>
-          <SettingsTitle title="软件测试" />
+      <SettingsTitle title="软件测试" />
 
-          <SettingsCard>
-            <SettingsItem title="发送通知" subtitle="点击后立即发送 Toast 通知" icon={<BellRingingIcon />}>
-              <div className="flex gap-2">
-                <Button onClick={() => toast.success({ title: "单行标题" })}>成功</Button>
-                <Button onClick={() => toast.warning({ title: "单行标题" })}>警告</Button>
-                <Button onClick={() => toast.error({ title: "多行标题", description: "多行多行多行多行多行多行多行内容" })}>错误</Button>
-                <Button onClick={() => toast.promise(new Promise((r) => setTimeout(r, 1500)), { loading: { title: "加载中..." }, success: { title: "加载完成" } })}>加载</Button>
-              </div>
-            </SettingsItem>
-          </SettingsCard>
+      <SettingsCard>
+        <SettingsItem title="发送通知" subtitle="点击后立即发送 Toast 通知" icon={<BellRingingIcon />}>
+          <div className="flex gap-2">
+            <Button onClick={() => toast.success({ title: "单行标题" })}>成功</Button>
+            <Button onClick={() => toast.warning({ title: "单行标题" })}>警告</Button>
+            <Button onClick={() => toast.error({ title: "多行标题", description: "多行多行多行多行多行多行多行内容" })}>错误</Button>
+            <Button onClick={() => toast.promise(new Promise((r) => setTimeout(r, 1500)), { loading: { title: "加载中..." }, success: { title: "加载完成" } })}>加载</Button>
+          </div>
+        </SettingsItem>
+      </SettingsCard>
 
-          <SettingsCard>
-            <SettingsItem title="开启浏览器窗口" subtitle="显示或隐藏用于 Cloudflare 验证的浏览器窗口" icon={<BrowserIcon />}>
-              <Button onClick={handleToggleBrowserVisibility}>{isBrowserVisible ? "隐藏" : "显示"}</Button>
-            </SettingsItem>
-          </SettingsCard>
-        </>
-      )}
+      <SettingsCard>
+        <SettingsItem title="开启浏览器窗口" subtitle="显示或隐藏用于 Cloudflare 验证的浏览器窗口" icon={<BrowserIcon />}>
+          <Button onClick={handleToggleBrowserVisibility}>{isBrowserVisible ? "隐藏" : "显示"}</Button>
+        </SettingsItem>
+      </SettingsCard>
     </SettingsContent>
   )
 }
