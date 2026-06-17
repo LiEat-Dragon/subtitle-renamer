@@ -30,7 +30,7 @@
       "capabilities": [
         {
           "identifier": "default",
-          "windows": ["main"],
+          "windows": ["main", "acgrip-browser"],
           "permissions": [
             "core:default",
             "core:window:allow-close",

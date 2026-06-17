@@ -24,6 +24,21 @@ pub fn create_menu(app: &App) -> Result<Menu<tauri::Wry>, Box<dyn std::error::Er
                 .accelerator("Cmd+1")
                 .build(app)?,
         )
+        .item(
+            &MenuItemBuilder::with_id("download", "字幕下载")
+                .accelerator("Cmd+2")
+                .build(app)?,
+        )
+        .build()?;
+
+    let edit_menu = SubmenuBuilder::new(app, "编辑")
+        .item(&PredefinedMenuItem::undo(app, Some("撤销"))?)
+        .item(&PredefinedMenuItem::redo(app, Some("重做"))?)
+        .separator()
+        .item(&PredefinedMenuItem::cut(app, Some("剪切"))?)
+        .item(&PredefinedMenuItem::copy(app, Some("复制"))?)
+        .item(&PredefinedMenuItem::paste(app, Some("粘贴"))?)
+        .item(&PredefinedMenuItem::select_all(app, Some("全选"))?)
         .build()?;
 
     let window_menu = SubmenuBuilder::new(app, "窗口")
@@ -35,6 +50,7 @@ pub fn create_menu(app: &App) -> Result<Menu<tauri::Wry>, Box<dyn std::error::Er
 
     let menu = MenuBuilder::new(app)
         .item(&app_menu)
+        .item(&edit_menu)
         .item(&func_menu)
         .item(&window_menu)
         .build()?;
@@ -51,6 +67,9 @@ pub fn create_menu(app: &App) -> Result<Menu<tauri::Wry>, Box<dyn std::error::Er
         }
         "renamer" => {
             let _ = app.emit("navigate", "/");
+        }
+        "download" => {
+            let _ = app.emit("navigate", "/download");
         }
         _ => {}
     });

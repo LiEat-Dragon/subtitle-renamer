@@ -1,3 +1,4 @@
+mod browser;
 mod extract;
 mod file_time;
 #[cfg(target_os = "macos")]
@@ -33,12 +34,38 @@ fn modify_time(source_path: String, target_path: String) -> Result<(), String> {
     file_time::modify_time_inner(&source_path, &target_path).map_err(|e| e.to_string())
 }
 
+#[tauri::command]
+fn show_browser(app: AppHandle) -> Result<(), String> {
+    browser::show_browser_inner(app)
+}
+
+#[tauri::command]
+fn hide_browser(app: AppHandle) -> Result<(), String> {
+    browser::hide_browser_inner(app)
+}
+
+#[tauri::command]
+fn search_posts(app: AppHandle, query: String) -> Result<(), String> {
+    browser::search_posts_inner(app, &query)
+}
+
+#[tauri::command]
+fn get_post(app: AppHandle, post_url: String) -> Result<(), String> {
+    browser::get_post_inner(app, &post_url)
+}
+
+#[tauri::command]
+fn download_subtitle(app: AppHandle, file_url: String) -> Result<(), String> {
+    browser::download_subtitle_inner(app, &file_url)
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     Builder::default()
         .plugin(
             tauri_plugin_window_state::Builder::default()
                 .skip_initial_state("main")
+                .skip_initial_state("acgrip-browser")
                 .build(),
         )
         .plugin(tauri_plugin_opener::init())
@@ -52,22 +79,29 @@ pub fn run() {
             set_theme,
             extract_archive,
             move_to_trash,
-            modify_time
+            modify_time,
+            show_browser,
+            hide_browser,
+            search_posts,
+            get_post,
+            download_subtitle
         ])
         .setup(|app| {
             let window = app.get_webview_window("main").unwrap();
 
+            // 预创建浏览器窗口
+            browser::create_hidden_window(app.handle()).map_err(std::io::Error::other)?;
+
             // 获取配置
             let store = app.store("config.json").ok();
-            let general = store.as_ref().and_then(|s| s.get("general"));
-            let remember_window = general
+            let remember_window = store
                 .as_ref()
-                .and_then(|g| g.get("remember_window").cloned())
+                .and_then(|s| s.get("remember_window"))
                 .and_then(|v| v.as_bool())
                 .unwrap_or(false);
-            let enable_vibrancy = general
+            let enable_vibrancy = store
                 .as_ref()
-                .and_then(|g| g.get("window_vibrancy").cloned())
+                .and_then(|s| s.get("window_vibrancy"))
                 .and_then(|v| v.as_bool())
                 .unwrap_or(true);
 

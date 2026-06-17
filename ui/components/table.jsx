@@ -1,19 +1,73 @@
 import { useState, useRef, useEffect, useMemo } from "react"
+import { DragDropProvider } from "@dnd-kit/react"
+import { isSortableOperation, useSortable } from "@dnd-kit/react/sortable"
+import { RestrictToVerticalAxis } from "@dnd-kit/abstract/modifiers"
 import { getTableWidths, saveTableWidths } from "@/utils/storage"
+import { cn } from "@/utils/cn"
 
 const MIN_COLUMN_WIDTH = 200
 
-export function Table({ columns, data, onClick, onContextMenu }) {
+function TableCell({ id, columnKey, index, value, canDrag, isFirstColumn, isLastColumn, onClick, onContextMenu }) {
+  const { ref, isDragSource, isDropTarget } = useSortable({
+    id,
+    index,
+    group: columnKey,
+    type: columnKey,
+    accept: columnKey,
+    data: { columnKey, isEmpty: !canDrag },
+    disabled: canDrag ? false : { draggable: true },
+    transition: { duration: 160, easing: "cubic-bezier(0.25, 1, 0.5, 1)" }
+  })
+
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        "flex items-center h-8 transition-colors shrink-0",
+        isFirstColumn && "rounded-l-sm",
+        isLastColumn && "rounded-r-sm",
+        canDrag && "px-3 hover:bg-muted/40 cursor-grab active:cursor-grabbing",
+        index % 2 === 0 && "bg-muted/20",
+        isDragSource && "opacity-35",
+        isDropTarget && "bg-muted/40"
+      )}
+      onClick={onClick}
+      onContextMenu={onContextMenu}
+    >
+      {value && <p className="truncate cursor-[inherit]" dangerouslySetInnerHTML={{ __html: value }} />}
+    </div>
+  )
+}
+
+export function Table({ columns, data, cellIds, onClick, onContextMenu, onReorder }) {
   const [columnWidths, setColumnWidths] = useState([])
   const containerRef = useRef(null)
   const headerRef = useRef(null)
   const bodyRef = useRef(null)
   const columnWidthsRef = useRef([])
 
-  const header = columns.map((col) => col.title)
+  const header = useMemo(() => columns.map((col) => col.title), [columns])
   const columnKeys = useMemo(() => columns.map((col) => col.key), [columns])
-  const columnSignature = columnKeys.join("|")
   const totalWidth = useMemo(() => columnWidths.reduce((sum, width) => sum + width, 0), [columnWidths])
+  const { baseOrders, itemMaps } = useMemo(() => {
+    const baseOrders = {}
+    const itemMaps = {}
+
+    for (const columnKey of columnKeys) {
+      const items = data.flatMap((row, rowIndex) => {
+        const value = row[columnKey]
+        if (!value) return []
+
+        const rawId = cellIds?.[rowIndex]?.[columnKey] || `${rowIndex}:${value}`
+        return [{ id: `${columnKey}:${rawId}`, value }]
+      })
+
+      baseOrders[columnKey] = items.map(({ id }) => id)
+      itemMaps[columnKey] = new Map(items.map((item) => [item.id, item]))
+    }
+
+    return { baseOrders, itemMaps }
+  }, [cellIds, columnKeys, data])
 
   useEffect(() => {
     columnWidthsRef.current = columnWidths
@@ -37,7 +91,7 @@ export function Table({ columns, data, onClick, onContextMenu }) {
         )
       )
     }
-  }, [columnKeys, columnSignature, data.length, header.length])
+  }, [columnKeys, data.length, header.length])
 
   // 横向滚动同步
   useEffect(() => {
@@ -77,6 +131,23 @@ export function Table({ columns, data, onClick, onContextMenu }) {
     document.addEventListener("mouseup", handleMouseUp, { signal: controller.signal })
   }
 
+  const handleDragEnd = (event) => {
+    if (event.canceled || !isSortableOperation(event.operation)) return
+
+    const { source } = event.operation
+    const columnKey = source.initialGroup
+    const fromIndex = source.initialIndex
+    const targetIndex = source.index
+
+    if (columnKey !== source.group || fromIndex === targetIndex) return
+
+    onReorder?.({
+      columnKey,
+      fromIndex,
+      targetIndex
+    })
+  }
+
   return (
     <div ref={containerRef} className="flex-1 flex flex-col overflow-hidden">
       <div ref={headerRef} className="sticky top-0 z-10 pl-1 border-b overflow-hidden">
@@ -96,26 +167,48 @@ export function Table({ columns, data, onClick, onContextMenu }) {
       </div>
 
       <div ref={bodyRef} className="flex-1 flex overflow-auto p-1">
-        <div className="flex flex-col gap-1" style={{ minWidth: totalWidth }}>
-          {data.map((row, rowIndex) => (
-            <div key={rowIndex} className="flex odd:bg-muted/20 hover:bg-muted/40 rounded-sm transition">
-              {columns.map((col, colIndex) => (
+        <DragDropProvider modifiers={[RestrictToVerticalAxis]} onDragEnd={handleDragEnd}>
+          <div className="flex" style={{ minWidth: totalWidth }}>
+            {columns.map((col, colIndex) => {
+              const order = baseOrders[col.key] || []
+              const itemMap = itemMaps[col.key] || new Map()
+              const emptyCount = Math.max(0, data.length - order.length)
+
+              return (
                 <div
-                  key={colIndex}
-                  className="flex items-center h-8 px-3"
+                  key={col.key}
+                  className="flex flex-col gap-1 shrink-0"
                   style={{ width: columnWidths[colIndex] }}
-                  onClick={() => onClick?.({ row: rowIndex, col: colIndex })}
-                  onContextMenu={(e) => {
-                    e.preventDefault()
-                    onContextMenu?.({ x: e.clientX, y: e.clientY, row: rowIndex, col: colIndex })
-                  }}
                 >
-                  <p className="truncate" dangerouslySetInnerHTML={{ __html: row[col.key] || "" }} />
+                  {[
+                    ...order.map((id, rowIndex) => ({ id, rowIndex, item: itemMap.get(id) })),
+                    ...Array.from({ length: emptyCount }, (_, i) => ({
+                      id: `${col.key}:empty:${order.length + i}`,
+                      rowIndex: order.length + i,
+                      item: null
+                    }))
+                  ].map(({ id, rowIndex, item }) => (
+                    <TableCell
+                      key={id}
+                      id={id}
+                      columnKey={col.key}
+                      index={rowIndex}
+                      value={item?.value || ""}
+                      canDrag={!!item}
+                      isFirstColumn={colIndex === 0}
+                      isLastColumn={colIndex === columns.length - 1}
+                      onClick={() => onClick?.({ row: rowIndex, col: colIndex })}
+                      onContextMenu={(event) => {
+                        event.preventDefault()
+                        onContextMenu?.({ x: event.clientX, y: event.clientY, row: rowIndex, col: colIndex })
+                      }}
+                    />
+                  ))}
                 </div>
-              ))}
-            </div>
-          ))}
-        </div>
+              )
+            })}
+          </div>
+        </DragDropProvider>
       </div>
     </div>
   )
