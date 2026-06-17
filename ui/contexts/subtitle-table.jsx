@@ -81,7 +81,7 @@ export function SubtitleTableContextMenu({ cell, fileData, tableScope, onClose }
   const canMoveUp = hasContent && cell.row > 0
   const canMoveDown = hasContent && cell.row < colData.length - 1
   const isSubtitle = cell && [1, 2].includes(cell.col)
-  const detectLanguage = config?.subtitle?.detect_language
+  const detectLanguage = config?.detect_language
 
   return (
     <ContextMenu cell={cell} onClose={onClose}>

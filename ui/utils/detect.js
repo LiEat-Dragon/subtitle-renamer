@@ -89,7 +89,7 @@ export async function detectFiles(paths, fileList, archiveList) {
   const hasRecognizedFile = rootItems.some(({ info, ext }) =>
     info.isFile && (VIDEO_EXTENSIONS.has(ext) || SUBTITLE_EXTENSIONS.has(ext) || ARCHIVE_EXTENSIONS.has(ext))
   )
-  const shouldSkipFolders = config.subtitle.skip_folder_mixed && hasDirectory && hasRecognizedFile
+  const shouldSkipFolders = config.skip_folder_mixed && hasDirectory && hasRecognizedFile
 
   // 跳过重复文件，展开文件夹和直接拖入的压缩包
   for (const { path, info, ext } of rootItems) {
@@ -100,7 +100,7 @@ export async function detectFiles(paths, fileList, archiveList) {
       }
 
       try {
-        const directoryFiles = await collectDirectoryFiles(path, config.subtitle.detect_folder_recursively)
+        const directoryFiles = await collectDirectoryFiles(path, config.detect_folder_recursively)
         for (const file of directoryFiles) {
           addFile(file)
         }
@@ -141,9 +141,9 @@ export async function detectFiles(paths, fileList, archiveList) {
 
   // 构建排除指定视频和字幕文件名的正则
   // eslint-disable-next-line @stylistic/max-statements-per-line
-  const excludeVideoRegex = (() => { try { const pattern = config.subtitle.exclude_video?.trim(); return pattern ? new RegExp(pattern, "i") : null } catch { return null } })()
+  const excludeVideoRegex = (() => { try { const pattern = config.exclude_video?.trim(); return pattern ? new RegExp(pattern, "i") : null } catch { return null } })()
   // eslint-disable-next-line @stylistic/max-statements-per-line
-  const excludeSubtitleRegex = (() => { try { const pattern = config.subtitle.exclude_subtitle?.trim(); return pattern ? new RegExp(pattern, "i") : null } catch { return null } })()
+  const excludeSubtitleRegex = (() => { try { const pattern = config.exclude_subtitle?.trim(); return pattern ? new RegExp(pattern, "i") : null } catch { return null } })()
 
   // 分类文件
   await Promise.all(allFiles.map(async (path) => {
@@ -165,7 +165,7 @@ export async function detectFiles(paths, fileList, archiveList) {
         excludedCount++
         return
       }
-      const lang = config?.subtitle?.detect_language ? await detectSubtitleLanguage(path, config) : "sc"
+      const lang = config?.detect_language ? await detectSubtitleLanguage(path, config) : "sc"
       newFiles[lang].push(path)
     } else {
       filteredCount++
@@ -212,7 +212,7 @@ async function collectDirectoryFiles(directoryPath, recursive) {
 
 async function detectSubtitleLanguage(path, config) {
   // 先通过文件扩展名判断
-  if (config?.subtitle?.lite_detect) {
+  if (config?.lite_detect) {
     const extensions = await getMiddleExtensions(path)
 
     for (const ext of extensions) {

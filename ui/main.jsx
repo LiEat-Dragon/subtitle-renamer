@@ -20,7 +20,7 @@ import { useConfigStore } from "@/store/config"
 
 // 初始化配置和主题模式
 useConfigStore.getState().initConfig().then(async (config) => {
-  await invoke("set_theme", { theme: config.general.theme })
+  await invoke("set_theme", { theme: config.window_theme })
 })
 
 // 监听菜单跳转

@@ -17,8 +17,8 @@ export async function createSubtitleTableData(fileList, config) {
     )
   )
 
-  const tableData = config?.subtitle?.highlight_diff
-    ? highlightDiff(basenameData, config.subtitle.highlight_ignore_case, config.subtitle.highlight_numbers_only)
+  const tableData = config?.highlight_diff
+    ? highlightDiff(basenameData, config.highlight_ignore_case, config.highlight_numbers_only)
     : basenameData
 
   return { fileData, tableData }

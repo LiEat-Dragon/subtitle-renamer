@@ -30,9 +30,9 @@ export function DownloadSetting() {
       const selected = await open({
         directory: true,
         multiple: false,
-        defaultPath: config?.download?.directory || defaultDirectory
+        defaultPath: config?.download_directory || defaultDirectory
       })
-      if (selected) await saveConfig("download", "directory", selected)
+      if (selected) await saveConfig("download_directory", selected)
     } catch (error) {
       toast.error({ title: "文件夹选择失败", description: error.message || String(error) })
     }
@@ -40,11 +40,11 @@ export function DownloadSetting() {
 
   const handleOpenDirectory = async () => {
     try {
-      const directoryExists = await exists(config?.download?.directory || defaultDirectory)
+      const directoryExists = await exists(config?.download_directory || defaultDirectory)
       await openPath(
         directoryExists
-          ? config?.download?.directory || defaultDirectory
-          : await dirname(config?.download?.directory || defaultDirectory)
+          ? config?.download_directory || defaultDirectory
+          : await dirname(config?.download_directory || defaultDirectory)
       )
     } catch (error) {
       toast.error({ title: "文件夹打开失败", description: error.message || String(error) })
@@ -58,7 +58,7 @@ export function DownloadSetting() {
       <SettingsCard>
         <SettingsItem
           title="下载位置"
-          subtitle={`字幕附件的保存目录。当前路径：${config?.download?.directory || defaultDirectory}`}
+          subtitle={`字幕附件的保存目录。当前路径：${config?.download_directory || defaultDirectory}`}
           icon={<FolderOpenIcon />}
         >
           <div className="flex gap-2">

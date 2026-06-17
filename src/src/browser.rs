@@ -174,11 +174,10 @@ fn resolve_download_path(app: &AppHandle, proposed: &Path) -> Result<PathBuf, St
     let downloads = app
         .store("config.json")
         .ok()
-        .and_then(|store| store.get("download"))
-        .and_then(|download| {
-            download
-                .get("directory")
-                .and_then(Value::as_str)
+        .and_then(|store| store.get("download_directory"))
+        .and_then(|download_directory| {
+            download_directory
+                .as_str()
                 .map(str::trim)
                 .filter(|directory| !directory.is_empty())
                 .map(PathBuf::from)

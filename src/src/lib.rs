@@ -94,15 +94,14 @@ pub fn run() {
 
             // 获取配置
             let store = app.store("config.json").ok();
-            let general = store.as_ref().and_then(|s| s.get("general"));
-            let remember_window = general
+            let remember_window = store
                 .as_ref()
-                .and_then(|g| g.get("remember_window").cloned())
+                .and_then(|s| s.get("remember_window"))
                 .and_then(|v| v.as_bool())
                 .unwrap_or(false);
-            let enable_vibrancy = general
+            let enable_vibrancy = store
                 .as_ref()
-                .and_then(|g| g.get("window_vibrancy").cloned())
+                .and_then(|s| s.get("window_vibrancy"))
                 .and_then(|v| v.as_bool())
                 .unwrap_or(true);
 

@@ -31,26 +31,26 @@ export function RenameSetting() {
         <SettingsItem title="显示配置标签" subtitle="在界面左下角显示主要配置状态的标签" icon={<TagIcon />} />
         <SettingsItem title="显示统一后缀编辑框" subtitle="在首页显示统一后缀的快捷编辑框">
           <Switch
-            checked={config?.subtitle?.config_quick_union_extension}
-            onChange={(checked) => saveConfig("subtitle", "config_quick_union_extension", checked)}
+            checked={config?.config_quick_union_extension}
+            onChange={(checked) => saveConfig("config_quick_union_extension", checked)}
           />
         </SettingsItem>
         <SettingsItem title="显示统一后缀名" subtitle="在配置标签中显示统一后缀名">
           <Switch
-            checked={config?.subtitle?.config_badge_union_extension}
-            onChange={(checked) => saveConfig("subtitle", "config_badge_union_extension", checked)}
+            checked={config?.config_badge_union_extension}
+            onChange={(checked) => saveConfig("config_badge_union_extension", checked)}
           />
         </SettingsItem>
         <SettingsItem title="显示移动字幕选项" subtitle="在配置标签中显示移动字幕的状态选项">
           <Switch
-            checked={config?.subtitle?.config_badge_move_sub}
-            onChange={(checked) => saveConfig("subtitle", "config_badge_move_sub", checked)}
+            checked={config?.config_badge_move_sub}
+            onChange={(checked) => saveConfig("config_badge_move_sub", checked)}
           />
         </SettingsItem>
         <SettingsItem title="显示删除字幕选项" subtitle="在配置标签中显示删除字幕的状态选项">
           <Switch
-            checked={config?.subtitle?.config_badge_remove_sub}
-            onChange={(checked) => saveConfig("subtitle", "config_badge_remove_sub", checked)}
+            checked={config?.config_badge_remove_sub}
+            onChange={(checked) => saveConfig("config_badge_remove_sub", checked)}
           />
         </SettingsItem>
       </SettingsCard>
@@ -58,20 +58,20 @@ export function RenameSetting() {
       <SettingsCard>
         <SettingsItem title="高亮文件名差异" subtitle="在表格中加粗显示同列文件名之间的差异部分" icon={<HighlighterIcon />}>
           <Switch
-            checked={config?.subtitle?.highlight_diff}
-            onChange={(checked) => saveConfig("subtitle", "highlight_diff", checked)}
+            checked={config?.highlight_diff}
+            onChange={(checked) => saveConfig("highlight_diff", checked)}
           />
         </SettingsItem>
         <SettingsItem title="忽略大小写" subtitle="对比差异时忽略字母大小写">
           <Switch
-            checked={config?.subtitle?.highlight_ignore_case}
-            onChange={(checked) => saveConfig("subtitle", "highlight_ignore_case", checked)}
+            checked={config?.highlight_ignore_case}
+            onChange={(checked) => saveConfig("highlight_ignore_case", checked)}
           />
         </SettingsItem>
         <SettingsItem title="只对比数字" subtitle="只高亮显示数字部分的差异，忽略其他字符">
           <Switch
-            checked={config?.subtitle?.highlight_numbers_only}
-            onChange={(checked) => saveConfig("subtitle", "highlight_numbers_only", checked)}
+            checked={config?.highlight_numbers_only}
+            onChange={(checked) => saveConfig("highlight_numbers_only", checked)}
           />
         </SettingsItem>
       </SettingsCard>
@@ -81,37 +81,37 @@ export function RenameSetting() {
       <SettingsCard>
         <SettingsItem title="简繁识别" subtitle="添加文件时，自动识别字幕语言为简体或繁体。禁用后，所有字幕均视作简体字幕" icon={<ArrowsClockwiseIcon />}>
           <Switch
-            checked={config?.subtitle?.detect_language}
-            onChange={(checked) => saveConfig("subtitle", "detect_language", checked)}
+            checked={config?.detect_language}
+            onChange={(checked) => saveConfig("detect_language", checked)}
           />
         </SettingsItem>
         <SettingsItem title="轻量识别" subtitle="优先根据文件名中的 sc/tc/chs/cht 等扩展名识别简繁类型，匹配失败再通过内容进行识别">
           <Switch
-            checked={config?.subtitle?.lite_detect}
-            onChange={(checked) => saveConfig("subtitle", "lite_detect", checked)}
+            checked={config?.lite_detect}
+            onChange={(checked) => saveConfig("lite_detect", checked)}
           />
         </SettingsItem>
       </SettingsCard>
 
       <SettingsItem title="文件夹递归" subtitle="拖入文件夹时，继续识别所有子文件夹中的视频和字幕" icon={<FoldersIcon />}>
         <Switch
-          checked={config?.subtitle?.detect_folder_recursively}
-          onChange={(checked) => saveConfig("subtitle", "detect_folder_recursively", checked)}
+          checked={config?.detect_folder_recursively}
+          onChange={(checked) => saveConfig("detect_folder_recursively", checked)}
         />
       </SettingsItem>
 
       <SettingsItem title="文件夹过滤" subtitle="同时拖入包含视频、字幕或压缩包的多种文件时，自动排除文件夹" icon={<FolderMinusIcon />}>
         <Switch
-          checked={config?.subtitle?.skip_folder_mixed}
-          onChange={(checked) => saveConfig("subtitle", "skip_folder_mixed", checked)}
+          checked={config?.skip_folder_mixed}
+          onChange={(checked) => saveConfig("skip_folder_mixed", checked)}
         />
       </SettingsItem>
 
       <SettingsCard>
         <SettingsItem title="排除视频文件名" subtitle="是否排除文件名含特定内容的视频。使用 | 或正则表达式来匹配多个内容" icon={<ProhibitIcon />}>
           <Input
-            value={config?.subtitle?.exclude_video}
-            onChange={(e) => saveConfig("subtitle", "exclude_video", e.target.value)}
+            value={config?.exclude_video}
+            onChange={(e) => saveConfig("exclude_video", e.target.value)}
             placeholder="不排除视频"
             className="w-72"
           />
@@ -121,8 +121,8 @@ export function RenameSetting() {
       <SettingsCard>
         <SettingsItem title="排除字幕文件名" subtitle="是否排除文件名含特定内容的字幕(不对压缩包生效)。使用 | 或正则表达式来匹配多个内容" icon={<ProhibitIcon />}>
           <Input
-            value={config?.subtitle?.exclude_subtitle}
-            onChange={(e) => saveConfig("subtitle", "exclude_subtitle", e.target.value)}
+            value={config?.exclude_subtitle}
+            onChange={(e) => saveConfig("exclude_subtitle", e.target.value)}
             placeholder="不排除字幕"
             className="w-72"
           />
@@ -134,8 +134,8 @@ export function RenameSetting() {
       <SettingsCard>
         <SettingsItem title="转换为小写扩展名" subtitle="重命名时将视频与字幕文件的扩展名都转换为小写" icon={<TextAaIcon />}>
           <Switch
-            checked={config?.subtitle?.lowercase_extension}
-            onChange={(checked) => saveConfig("subtitle", "lowercase_extension", checked)}
+            checked={config?.lowercase_extension}
+            onChange={(checked) => saveConfig("lowercase_extension", checked)}
           />
         </SettingsItem>
       </SettingsCard>
@@ -144,8 +144,8 @@ export function RenameSetting() {
         <SettingsItem title="移动字幕" subtitle="重命名完成后，是否移动字幕到视频文件夹" icon={<CopyIcon />}>
           <Select
             options={moveSubOptions}
-            value={config?.subtitle?.move_sub}
-            onChange={(value) => saveConfig("subtitle", "move_sub", value)}
+            value={config?.move_sub}
+            onChange={(value) => saveConfig("move_sub", value)}
             className="w-48"
           />
         </SettingsItem>
@@ -155,8 +155,8 @@ export function RenameSetting() {
         <SettingsItem title="删除字幕" subtitle="重命名完成后，是否删除指定的字幕文件" icon={<TrashIcon />}>
           <Select
             options={removeSubOptions}
-            value={config?.subtitle?.remove_sub}
-            onChange={(value) => saveConfig("subtitle", "remove_sub", value)}
+            value={config?.remove_sub}
+            onChange={(value) => saveConfig("remove_sub", value)}
             className="w-48"
           />
         </SettingsItem>
@@ -165,8 +165,8 @@ export function RenameSetting() {
       <SettingsCard>
         <SettingsItem title="删除压缩包" subtitle="重命名完成后，是否删除字幕压缩包。仅当拖入字幕压缩包时生效" icon={<FileArchiveIcon />}>
           <Switch
-            checked={config?.subtitle?.remove_zip}
-            onChange={(checked) => saveConfig("subtitle", "remove_zip", checked)}
+            checked={config?.remove_zip}
+            onChange={(checked) => saveConfig("remove_zip", checked)}
           />
         </SettingsItem>
       </SettingsCard>
@@ -176,10 +176,10 @@ export function RenameSetting() {
       <SettingsCard>
         <SettingsItem title="统一后缀" subtitle="重命名字幕时，在扩展名前为所有语言字幕添加后缀" icon={<FileDashedIcon />}>
           <Combobox
-            options={config?.subtitle?.union_extension_options}
-            value={config?.subtitle?.union_extension}
-            onChange={(value) => saveConfig("subtitle", "union_extension", value)}
-            onOptionsChange={(options) => saveConfig("subtitle", "union_extension_options", options)}
+            options={config?.union_extension_options}
+            value={config?.union_extension}
+            onChange={(value) => saveConfig("union_extension", value)}
+            onOptionsChange={(options) => saveConfig("union_extension_options", options)}
             placeholder="无后缀"
             className="w-72"
           />
@@ -189,10 +189,10 @@ export function RenameSetting() {
       <SettingsCard>
         <SettingsItem title="简体字幕后缀" subtitle="重命名字幕时，在扩展名前为简体字幕添加后缀" icon={<FileDashedIcon />}>
           <Combobox
-            options={config?.subtitle?.sc_extension_options}
-            value={config?.subtitle?.sc_extension}
-            onChange={(value) => saveConfig("subtitle", "sc_extension", value)}
-            onOptionsChange={(options) => saveConfig("subtitle", "sc_extension_options", options)}
+            options={config?.sc_extension_options}
+            value={config?.sc_extension}
+            onChange={(value) => saveConfig("sc_extension", value)}
+            onOptionsChange={(options) => saveConfig("sc_extension_options", options)}
             placeholder="无后缀"
             className="w-72"
           />
@@ -202,10 +202,10 @@ export function RenameSetting() {
       <SettingsCard>
         <SettingsItem title="繁体字幕后缀" subtitle="重命名字幕时，在扩展名前为繁体字幕添加后缀" icon={<FileDashedIcon />}>
           <Combobox
-            options={config?.subtitle?.tc_extension_options}
-            value={config?.subtitle?.tc_extension}
-            onChange={(value) => saveConfig("subtitle", "tc_extension", value)}
-            onOptionsChange={(options) => saveConfig("subtitle", "tc_extension_options", options)}
+            options={config?.tc_extension_options}
+            value={config?.tc_extension}
+            onChange={(value) => saveConfig("tc_extension", value)}
+            onOptionsChange={(options) => saveConfig("tc_extension_options", options)}
             placeholder="无后缀"
             className="w-72"
           />

@@ -23,8 +23,8 @@ export function GeneralSetting() {
               { value: "light", label: "浅色" },
               { value: "dark", label: "深色" }
             ]}
-            value={config?.general?.theme}
-            onChange={(value) => saveConfig("general", "theme", value)}
+            value={config?.window_theme}
+            onChange={(value) => saveConfig("window_theme", value)}
             className="w-48"
           />
         </SettingsItem>
@@ -35,8 +35,8 @@ export function GeneralSetting() {
       <SettingsCard>
         <SettingsItem title="启用窗口材质" subtitle="启用系统的 Mica 或 Vibrancy 等窗口效果。修改后需重启生效" icon={<BrowserIcon />}>
           <Switch
-            checked={config?.general?.window_vibrancy ?? true}
-            onChange={(checked) => saveConfig("general", "window_vibrancy", checked)}
+            checked={config?.window_vibrancy ?? true}
+            onChange={(checked) => saveConfig("window_vibrancy", checked)}
           />
         </SettingsItem>
       </SettingsCard>
@@ -44,8 +44,8 @@ export function GeneralSetting() {
       <SettingsCard>
         <SettingsItem title="记住窗口尺寸" subtitle="程序启动时恢复上次关闭时的窗口大小和位置" icon={<FrameCornersIcon />}>
           <Switch
-            checked={config?.general?.remember_window}
-            onChange={(checked) => saveConfig("general", "remember_window", checked)}
+            checked={config?.remember_window}
+            onChange={(checked) => saveConfig("remember_window", checked)}
           />
         </SettingsItem>
       </SettingsCard>

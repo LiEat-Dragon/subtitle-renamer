@@ -25,14 +25,14 @@ export async function renameSubtitles(fileData, archiveList) {
     toast.error({ title: "视频与字幕数量不相等" })
     return false
   }
-  if (config?.subtitle?.detect_language && config?.subtitle?.sc_extension === config?.subtitle?.tc_extension) {
+  if (config?.detect_language && config?.sc_extension === config?.tc_extension) {
     toast.error({ title: "配置无效", description: "简体字幕与繁体字幕的后缀不可相同" })
     return false
   }
 
   try {
-    const moveSub = config.subtitle.move_sub
-    const removeSub = config.subtitle.remove_sub
+    const moveSub = config.move_sub
+    const removeSub = config.remove_sub
     const pathsToTrash = []
 
     // 构建新旧路径
@@ -42,12 +42,12 @@ export async function renameSubtitles(fileData, archiveList) {
       const videoExt = await extname(row.video)
       const videoName = await basename(row.video, `.${videoExt}`)
 
-      for (const [lang, subPath, suffix] of [["sc", row.sc, config.subtitle.sc_extension], ["tc", row.tc, config.subtitle.tc_extension]]) {
+      for (const [lang, subPath, suffix] of [["sc", row.sc, config.sc_extension], ["tc", row.tc, config.tc_extension]]) {
         if (!subPath) continue
         if (lang === removeSub) continue
         const subExtRaw = await extname(subPath)
-        const subExt = config.subtitle.lowercase_extension ? subExtRaw.toLowerCase() : subExtRaw
-        const newPath = await join(videoDir, `${videoName}${config.subtitle.union_extension}${suffix}.${subExt}`)
+        const subExt = config.lowercase_extension ? subExtRaw.toLowerCase() : subExtRaw
+        const newPath = await join(videoDir, `${videoName}${config.union_extension}${suffix}.${subExt}`)
 
         if (await exists(newPath)) {
           toast.error({ title: "目标文件已存在", description: newPath })
@@ -84,7 +84,7 @@ export async function renameSubtitles(fileData, archiveList) {
     }
 
     // 视频扩展名转小写（字幕扩展名已经在上面根据配置转换过了）
-    if (config.subtitle.lowercase_extension) {
+    if (config.lowercase_extension) {
       for (const row of fileData) {
         const videoDir = await dirname(row.video)
         const videoExtRaw = await extname(row.video)
@@ -106,7 +106,7 @@ export async function renameSubtitles(fileData, archiveList) {
     }
 
     // 收集压缩包路径等待删除
-    if (config.subtitle.remove_zip && archiveList.length > 0) {
+    if (config.remove_zip && archiveList.length > 0) {
       for (const archivePath of archiveList) {
         if (await exists(archivePath)) {
           pathsToTrash.push(archivePath)

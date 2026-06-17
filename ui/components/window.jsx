@@ -4,7 +4,7 @@ import { cn } from "@/utils/cn"
 
 export function AppWindow({ children }) {
   const config = useConfigStore((s) => s.config)
-  const enableVibrancy = config?.general?.window_vibrancy ?? true
+  const enableVibrancy = config?.window_vibrancy ?? true
 
   const itemPlatform = {
     windows: enableVibrancy ? "" : "bg-background-dark",

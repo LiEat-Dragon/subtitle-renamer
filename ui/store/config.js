@@ -3,39 +3,33 @@ import { load } from "@tauri-apps/plugin-store"
 import { create } from "zustand"
 
 const DEFAULT_CONFIG = {
-  general: {
-    theme: "system",
-    window_vibrancy: true,
-    remember_window: true
-  },
-  subtitle: {
-    config_quick_union_extension: false,
-    config_badge_union_extension: false,
-    config_badge_move_sub: true,
-    config_badge_remove_sub: true,
-    highlight_diff: true,
-    highlight_ignore_case: false,
-    highlight_numbers_only: false,
-    detect_language: true,
-    detect_folder_recursively: false,
-    skip_folder_mixed: true,
-    lite_detect: false,
-    exclude_video: "",
-    exclude_subtitle: "",
-    union_extension: "",
-    union_extension_options: [],
-    sc_extension: "",
-    sc_extension_options: [".sc", ".chs", ".zh-Hans"],
-    tc_extension: ".tc",
-    tc_extension_options: [".tc", ".cht", ".zh-Hant"],
-    lowercase_extension: true,
-    move_sub: "cut",
-    remove_sub: "none",
-    remove_zip: true
-  },
-  download: {
-    directory: ""
-  }
+  window_theme: "system",
+  window_vibrancy: true,
+  remember_window: true,
+  config_quick_union_extension: false,
+  config_badge_union_extension: false,
+  config_badge_move_sub: true,
+  config_badge_remove_sub: true,
+  highlight_diff: true,
+  highlight_ignore_case: false,
+  highlight_numbers_only: false,
+  detect_language: true,
+  detect_folder_recursively: false,
+  skip_folder_mixed: true,
+  lite_detect: false,
+  exclude_video: "",
+  exclude_subtitle: "",
+  union_extension: "",
+  union_extension_options: [],
+  sc_extension: "",
+  sc_extension_options: [".sc", ".chs", ".zh-Hans"],
+  tc_extension: ".tc",
+  tc_extension_options: [".tc", ".cht", ".zh-Hant"],
+  lowercase_extension: true,
+  move_sub: "cut",
+  remove_sub: "none",
+  remove_zip: true,
+  download_directory: ""
 }
 
 let storeInstance = null
@@ -52,9 +46,10 @@ export const useConfigStore = create((set, get) => ({
 
   initConfig: async () => {
     const store = await getStore()
-    for (const [section, defaults] of Object.entries(DEFAULT_CONFIG)) {
-      const existing = await store.get(section)
-      await store.set(section, { ...defaults, ...existing })
+    for (const [key, value] of Object.entries(DEFAULT_CONFIG)) {
+      if (await store.get(key) === undefined) {
+        await store.set(key, value)
+      }
     }
     return await get().refreshConfig()
   },
@@ -65,36 +60,35 @@ export const useConfigStore = create((set, get) => ({
 
   refreshConfig: async () => {
     const store = await getStore()
-    const config = {}
-    for (const [section, defaults] of Object.entries(DEFAULT_CONFIG)) {
-      const data = await store.get(section)
-      config[section] = { ...defaults, ...data }
-    }
+    const entries = await Promise.all(
+      Object.entries(DEFAULT_CONFIG).map(async ([key, value]) => [key, await store.get(key) ?? value])
+    )
+    const config = Object.fromEntries(entries)
     set({ config })
     return config
   },
 
-  saveConfig: async (section, key, value) => {
+  saveConfig: async (key, value) => {
     set((state) => ({
       config: {
         ...state.config,
-        [section]: { ...state.config?.[section], [key]: value }
+        [key]: value
       }
     }))
 
     const store = await getStore()
-    const data = await store.get(section)
-    await store.set(section, { ...data, [key]: value })
+    await store.set(key, value)
 
-    if (section === "general" && key === "theme") {
+    if (key === "window_theme") {
       await invoke("set_theme", { theme: value })
     }
   },
 
   resetConfig: async () => {
     const store = await getStore()
-    for (const [section, defaults] of Object.entries(DEFAULT_CONFIG)) {
-      await store.set(section, defaults)
+    await store.clear()
+    for (const [key, value] of Object.entries(DEFAULT_CONFIG)) {
+      await store.set(key, value)
     }
     await get().refreshConfig()
   }

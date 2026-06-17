@@ -58,10 +58,10 @@ export function SubtitleRename() {
 
   // 切换配置标签状态
   const handleCycleSubtitleConfig = useCallback((key, options) => {
-    const currentValue = config?.subtitle?.[key]
+    const currentValue = config?.[key]
     const currentIndex = options.findIndex((option) => option.value === currentValue)
     const nextValue = options[(currentIndex + 1) % options.length].value
-    saveConfig("subtitle", key, nextValue)
+    saveConfig(key, nextValue)
   }, [config, saveConfig])
 
   // 重命名字幕
@@ -81,8 +81,8 @@ export function SubtitleRename() {
                 <Table
                   columns={[
                     { key: "video", title: "视频文件" },
-                    { key: "sc", title: config?.subtitle?.detect_language ? "简体字幕" : "字幕文件" },
-                    ...(config?.subtitle?.detect_language ? [{ key: "tc", title: "繁体字幕" }] : [])
+                    { key: "sc", title: config?.detect_language ? "简体字幕" : "字幕文件" },
+                    ...(config?.detect_language ? [{ key: "tc", title: "繁体字幕" }] : [])
                   ]}
                   data={tableData}
                   cellIds={fileData}
@@ -106,33 +106,33 @@ export function SubtitleRename() {
 
       <PageBlock className="items-center justify-end gap-3 p-4" last>
         <div className="flex-1 flex items-center gap-2">
-          {config?.subtitle?.config_quick_union_extension && (
+          {config?.config_quick_union_extension && (
             <Combobox
-              options={config?.subtitle?.union_extension_options}
-              value={config?.subtitle?.union_extension}
-              onChange={(value) => saveConfig("subtitle", "union_extension", value)}
-              onOptionsChange={(options) => saveConfig("subtitle", "union_extension_options", options)}
+              options={config?.union_extension_options}
+              value={config?.union_extension}
+              onChange={(value) => saveConfig("union_extension", value)}
+              onOptionsChange={(options) => saveConfig("union_extension_options", options)}
               placeholder="无后缀"
               className="w-56"
             />
           )}
-          {config?.subtitle?.config_badge_union_extension && config?.subtitle?.union_extension && (
-            <Badge variant="outline">添加后缀 {config.subtitle.union_extension}</Badge>
+          {config?.config_badge_union_extension && config?.union_extension && (
+            <Badge variant="outline">添加后缀 {config.union_extension}</Badge>
           )}
-          {config?.subtitle?.config_badge_move_sub && config?.subtitle?.move_sub && (
+          {config?.config_badge_move_sub && config?.move_sub && (
             <Badge
               variant="outline"
               onClick={() => handleCycleSubtitleConfig("move_sub", moveSubOptions)}
             >
-              {moveSubOptions.find((option) => option.value === config.subtitle.move_sub)?.label}
+              {moveSubOptions.find((option) => option.value === config.move_sub)?.label}
             </Badge>
           )}
-          {config?.subtitle?.config_badge_remove_sub && config?.subtitle?.remove_sub && (
+          {config?.config_badge_remove_sub && config?.remove_sub && (
             <Badge
               variant="outline"
               onClick={() => handleCycleSubtitleConfig("remove_sub", removeSubOptions)}
             >
-              {removeSubOptions.find((option) => option.value === config.subtitle.remove_sub)?.label}
+              {removeSubOptions.find((option) => option.value === config.remove_sub)?.label}
             </Badge>
           )}
         </div>
