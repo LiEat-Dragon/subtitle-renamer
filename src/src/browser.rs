@@ -15,12 +15,11 @@ const SEARCH_URL: &str = "https://bbs.acgrip.com/search.php";
 const PAGE_INSPECTION_SCRIPT: &str = r##"
 (() => {
   const title = document.title || "";
-  const bodyText = document.body?.textContent?.trim() || "";
   const challenge = title.includes("Just a moment")
     || title.includes("Attention Required")
     || document.querySelector("#challenge-running, .cf-challenge-running, .cf-turnstile") !== null
     || document.querySelector("script[src*=\"challenges.cloudflare.com\"], iframe[src*=\"challenges.cloudflare.com\"]") !== null;
-  if (challenge || location.hostname !== "bbs.acgrip.com" || bodyText.length < 50) {
+  if (challenge || location.hostname !== "bbs.acgrip.com") {
     return null;
   }
 
@@ -32,8 +31,9 @@ const PAGE_INSPECTION_SCRIPT: &str = r##"
 "##;
 
 pub fn open_challenge_inner(app: AppHandle) -> Result<(), String> {
-    let url = Url::parse(HOME_URL).map_err(|e| e.to_string())?;
-    let window = navigate_browser_window(&app, url)?;
+    let window = app
+        .get_webview_window(WINDOW_LABEL)
+        .ok_or_else(|| "浏览器窗口初始化失败，请重启应用".to_string())?;
     let _ = window.unminimize();
     window.show().map_err(|e| e.to_string())?;
     window.set_focus().map_err(|e| e.to_string())
@@ -84,6 +84,9 @@ pub fn create_hidden_window(app: &AppHandle) -> Result<(), String> {
     WebviewWindowBuilder::new(app, WINDOW_LABEL, WebviewUrl::External(url))
         .title("CF过盾小助手")
         .min_inner_size(800.0, 600.0)
+        .closable(false)
+        .minimizable(false)
+        .maximizable(false)
         .center()
         .visible(false)
         .enable_clipboard_access()
@@ -101,19 +104,17 @@ pub fn create_hidden_window(app: &AppHandle) -> Result<(), String> {
                         value => Ok(value),
                     })
                     .ok();
-                let Some(payload) = payload else {
-                    let _ = app.emit("session-verified", false);
-                    return;
-                };
-
-                let verified = payload.is_object();
-                let _ = app.emit("session-verified", verified);
-                if !verified {
-                    return;
+                match payload {
+                    Some(Value::Null) => {
+                        let _ = app.emit("session-verified", false);
+                    }
+                    Some(Value::Object(payload)) => {
+                        let _ = app.emit("session-verified", true);
+                        let _ = browser.hide();
+                        let _ = app.emit("browser-page", &payload);
+                    }
+                    _ => {}
                 }
-
-                let _ = browser.hide();
-                let _ = app.emit("browser-page", &payload);
             });
         })
         .on_download(move |_, event| {

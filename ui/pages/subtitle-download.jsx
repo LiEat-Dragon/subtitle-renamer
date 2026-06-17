@@ -105,26 +105,29 @@ export function SubtitleDownload() {
   // 监听后端会话验证
   useListen("session-verified", async (event) => {
     const retry = retryAfterVerificationRef.current
-    if (!retry || isWaitingForVerificationRef.current === false) return
+    if (!retry) return
 
     if (!event.payload) {
+      if (isWaitingForVerificationRef.current) return
       setVerificationWaiting(true)
       await invoke("open_challenge")
       return
     }
 
+    if (isWaitingForVerificationRef.current === false) return
+
     clearVerificationRetry()
-    await retry()
   })
 
   // 监听后端浏览器页面
   useListen("browser-page", (event) => {
-    clearVerificationRetry()
     const payload = parseAcgripPage(event.payload)
     if (payload?.kind === "search") {
+      clearVerificationRetry()
       setSearchResults(payload.results || [])
     }
     if (payload?.kind === "post") {
+      clearVerificationRetry()
       setPostFiles(payload.files || [])
     }
   })
