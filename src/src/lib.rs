@@ -35,8 +35,13 @@ fn modify_time(source_path: String, target_path: String) -> Result<(), String> {
 }
 
 #[tauri::command]
-fn open_challenge(app: AppHandle) -> Result<(), String> {
-    browser::open_challenge_inner(app)
+fn show_browser(app: AppHandle) -> Result<(), String> {
+    browser::show_browser_inner(app)
+}
+
+#[tauri::command]
+fn hide_browser(app: AppHandle) -> Result<(), String> {
+    browser::hide_browser_inner(app)
 }
 
 #[tauri::command]
@@ -75,7 +80,8 @@ pub fn run() {
             extract_archive,
             move_to_trash,
             modify_time,
-            open_challenge,
+            show_browser,
+            hide_browser,
             search_posts,
             get_post,
             download_subtitle

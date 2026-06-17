@@ -30,13 +30,20 @@ const PAGE_INSPECTION_SCRIPT: &str = r##"
 })()
 "##;
 
-pub fn open_challenge_inner(app: AppHandle) -> Result<(), String> {
+pub fn show_browser_inner(app: AppHandle) -> Result<(), String> {
     let window = app
         .get_webview_window(WINDOW_LABEL)
         .ok_or_else(|| "浏览器窗口初始化失败，请重启应用".to_string())?;
     let _ = window.unminimize();
     window.show().map_err(|e| e.to_string())?;
     window.set_focus().map_err(|e| e.to_string())
+}
+
+pub fn hide_browser_inner(app: AppHandle) -> Result<(), String> {
+    let window = app
+        .get_webview_window(WINDOW_LABEL)
+        .ok_or_else(|| "浏览器窗口初始化失败，请重启应用".to_string())?;
+    window.hide().map_err(|e| e.to_string())
 }
 
 pub fn search_posts_inner(app: AppHandle, query: &str) -> Result<(), String> {

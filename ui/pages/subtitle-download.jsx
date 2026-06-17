@@ -110,7 +110,7 @@ export function SubtitleDownload() {
     if (!event.payload) {
       if (isWaitingForVerificationRef.current) return
       setVerificationWaiting(true)
-      await invoke("open_challenge")
+      await invoke("show_browser")
       return
     }
 

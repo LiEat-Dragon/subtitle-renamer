@@ -1,13 +1,16 @@
+import { invoke } from "@tauri-apps/api/core"
 import { appDataDir } from "@tauri-apps/api/path"
 import { openPath } from "@tauri-apps/plugin-opener"
+import { useState } from "react"
 import { useConfigStore } from "@/store/config"
 import { clearTableWidths } from "@/utils/storage"
 import { SettingsContent, SettingsTitle, SettingsCard, SettingsItem } from "@/components/settings"
 import { toast } from "@/components/toast"
 import { Button } from "@/components/button"
-import { FolderOpenIcon, ArrowClockwiseIcon, BellRingingIcon, TableIcon } from "@phosphor-icons/react"
+import { FolderOpenIcon, ArrowClockwiseIcon, BellRingingIcon, TableIcon, BrowserIcon } from "@phosphor-icons/react"
 
 export function DeveloperSetting() {
+  const [isBrowserVisible, setIsBrowserVisible] = useState(false)
   const resetConfig = useConfigStore((s) => s.resetConfig)
 
   const handleOpenConfig = async () => {
@@ -37,6 +40,16 @@ export function DeveloperSetting() {
     }
   }
 
+  const handleToggleBrowserVisibility = async () => {
+    const visible = !isBrowserVisible
+    try {
+      await invoke(visible ? "show_browser" : "hide_browser")
+      setIsBrowserVisible(visible)
+    } catch (error) {
+      toast.error({ title: "窗口开启失败", description: error.message || String(error) })
+    }
+  }
+
   return (
     <SettingsContent>
       <SettingsTitle title="配置管理" />
@@ -63,7 +76,7 @@ export function DeveloperSetting() {
 
       {import.meta.env.DEV && (
         <>
-          <SettingsTitle title="通知测试" />
+          <SettingsTitle title="软件测试" />
 
           <SettingsCard>
             <SettingsItem title="发送通知" subtitle="点击后立即发送 Toast 通知" icon={<BellRingingIcon />}>
@@ -73,6 +86,12 @@ export function DeveloperSetting() {
                 <Button onClick={() => toast.error({ title: "多行标题", description: "多行多行多行多行多行多行多行内容" })}>错误</Button>
                 <Button onClick={() => toast.promise(new Promise((r) => setTimeout(r, 1500)), { loading: { title: "加载中..." }, success: { title: "加载完成" } })}>加载</Button>
               </div>
+            </SettingsItem>
+          </SettingsCard>
+
+          <SettingsCard>
+            <SettingsItem title="开启浏览器窗口" subtitle="显示或隐藏用于 Cloudflare 验证的浏览器窗口" icon={<BrowserIcon />}>
+              <Button onClick={handleToggleBrowserVisibility}>{isBrowserVisible ? "隐藏" : "显示"}</Button>
             </SettingsItem>
           </SettingsCard>
         </>
